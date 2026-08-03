@@ -52,7 +52,49 @@ const createAppointment = async (req, res) => {
 
   }
 };
+// Get appointments
+const getAppointments = async (req, res) => {
+  try {
+
+    let appointments = [];
+
+    if (req.user.role === "patient") {
+
+      appointments = await Appointment.find({
+        patient: req.user._id,
+      })
+        .populate("doctor", "fullName email")
+        .sort({ appointmentDate: 1 });
+
+    } else if (req.user.role === "doctor") {
+
+      appointments = await Appointment.find({
+        doctor: req.user._id,
+      })
+        .populate("patient", "fullName email")
+        .sort({ appointmentDate: 1 });
+
+    } else if (req.user.role === "admin") {
+
+      appointments = await Appointment.find()
+        .populate("patient", "fullName email")
+        .populate("doctor", "fullName email")
+        .sort({ appointmentDate: 1 });
+
+    }
+
+    res.json(appointments);
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message,
+    });
+
+  }
+};
 
 module.exports = {
   createAppointment,
+  getAppointments,
 };

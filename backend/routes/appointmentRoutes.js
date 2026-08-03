@@ -6,7 +6,14 @@ const protect = require("../middleware/authMiddleware");
 
 const {
   createAppointment,
+  getAppointments,
 } = require("../controllers/appointmentController");
+
+router.get(
+  "/",
+  protect,
+  getAppointments
+);
 
 router.post(
   "/",
