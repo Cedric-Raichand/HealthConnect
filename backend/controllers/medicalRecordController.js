@@ -2,8 +2,8 @@ const MedicalRecord = require("../models/MedicalRecord");
 const User = require("../models/User");
 
 
-// Create medical record (Doctor only)
-const createMedicalRecord = async (req, res) => {
+// Create medical record
+const createMedicalRecord = async (req, res, next) => {
   try {
 
     const {
@@ -13,14 +13,6 @@ const createMedicalRecord = async (req, res) => {
       treatment,
       notes,
     } = req.body;
-
-
-    // Only doctors can create records
-    if (req.user.role !== "doctor") {
-      return res.status(403).json({
-        message: "Only doctors can create medical records",
-      });
-    }
 
 
     // Validate fields
@@ -78,17 +70,16 @@ const createMedicalRecord = async (req, res) => {
 
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
 
 
 
+
 // Get medical records
-const getMedicalRecords = async (req, res) => {
+const getMedicalRecords = async (req, res, next) => {
   try {
 
     let records = [];
@@ -133,17 +124,16 @@ const getMedicalRecords = async (req, res) => {
 
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
 
 
 
+
 // Get single medical record
-const getMedicalRecordById = async (req, res) => {
+const getMedicalRecordById = async (req, res, next) => {
   try {
 
     const record = await MedicalRecord.findById(req.params.id)
@@ -187,9 +177,7 @@ const getMedicalRecordById = async (req, res) => {
 
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
