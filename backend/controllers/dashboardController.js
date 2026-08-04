@@ -5,7 +5,7 @@ const Prescription = require("../models/Prescription");
 
 
 // Get dashboard statistics
-const getDashboard = async (req, res) => {
+const getDashboard = async (req, res, next) => {
   try {
 
     let dashboard = {};
@@ -18,6 +18,7 @@ const getDashboard = async (req, res) => {
         patient: req.user._id,
       });
 
+
       const upcomingAppointments = await Appointment.countDocuments({
         patient: req.user._id,
         status: {
@@ -25,9 +26,11 @@ const getDashboard = async (req, res) => {
         },
       });
 
+
       const medicalRecords = await MedicalRecord.countDocuments({
         patient: req.user._id,
       });
+
 
       const prescriptions = await Prescription.countDocuments({
         patient: req.user._id,
@@ -51,15 +54,18 @@ const getDashboard = async (req, res) => {
         doctor: req.user._id,
       });
 
+
       const pendingAppointments = await Appointment.countDocuments({
         doctor: req.user._id,
         status: "pending",
       });
 
+
       const completedAppointments = await Appointment.countDocuments({
         doctor: req.user._id,
         status: "completed",
       });
+
 
       const patients = await Appointment.distinct(
         "patient",
@@ -84,17 +90,22 @@ const getDashboard = async (req, res) => {
 
       const users = await User.countDocuments();
 
+
       const doctors = await User.countDocuments({
         role: "doctor",
       });
+
 
       const patients = await User.countDocuments({
         role: "patient",
       });
 
+
       const appointments = await Appointment.countDocuments();
 
+
       const records = await MedicalRecord.countDocuments();
+
 
       const prescriptions = await Prescription.countDocuments();
 
@@ -116,9 +127,7 @@ const getDashboard = async (req, res) => {
 
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
