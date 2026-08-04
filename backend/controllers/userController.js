@@ -2,7 +2,7 @@ const User = require("../models/User");
 
 
 // Get logged-in user's profile
-const getProfile = async (req, res) => {
+const getProfile = async (req, res, next) => {
   try {
 
     const user = await User.findById(req.user._id)
@@ -21,9 +21,7 @@ const getProfile = async (req, res) => {
 
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
@@ -32,7 +30,7 @@ const getProfile = async (req, res) => {
 
 
 // Update logged-in user's profile
-const updateProfile = async (req, res) => {
+const updateProfile = async (req, res, next) => {
   try {
 
     const user = await User.findById(req.user._id);
@@ -64,17 +62,30 @@ const updateProfile = async (req, res) => {
 
     // Common fields
     user.fullName = fullName || user.fullName;
+
     user.phone = phone || user.phone;
+
     user.profileImage = profileImage || user.profileImage;
+
 
 
     // Patient fields
     if (req.user.role === "patient") {
 
-      user.dateOfBirth = dateOfBirth || user.dateOfBirth;
-      user.gender = gender || user.gender;
-      user.address = address || user.address;
-      user.bloodGroup = bloodGroup || user.bloodGroup;
+      user.dateOfBirth =
+        dateOfBirth || user.dateOfBirth;
+
+
+      user.gender =
+        gender || user.gender;
+
+
+      user.address =
+        address || user.address;
+
+
+      user.bloodGroup =
+        bloodGroup || user.bloodGroup;
 
 
       if (emergencyContact) {
@@ -91,19 +102,24 @@ const updateProfile = async (req, res) => {
       user.specialization =
         specialization || user.specialization;
 
+
       user.yearsOfExperience =
         yearsOfExperience || user.yearsOfExperience;
+
 
       user.licenseNumber =
         licenseNumber || user.licenseNumber;
 
+
       user.hospital =
         hospital || user.hospital;
+
 
       user.bio =
         bio || user.bio;
 
     }
+
 
 
     const updatedUser = await user.save();
@@ -114,11 +130,17 @@ const updateProfile = async (req, res) => {
       message: "Profile updated successfully",
 
       user: {
+
         id: updatedUser._id,
+
         fullName: updatedUser.fullName,
+
         email: updatedUser.email,
+
         role: updatedUser.role,
+
         phone: updatedUser.phone,
+
       },
 
     });
@@ -126,9 +148,7 @@ const updateProfile = async (req, res) => {
 
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
