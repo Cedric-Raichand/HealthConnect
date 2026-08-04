@@ -4,7 +4,7 @@ const generateToken = require("../utils/generateToken");
 
 
 // Register
-const registerUser = async (req, res) => {
+const registerUser = async (req, res, next) => {
 
   try {
 
@@ -33,6 +33,7 @@ const registerUser = async (req, res) => {
     const userExists = await User.findOne({
       email,
     });
+
 
     if (userExists) {
 
@@ -84,11 +85,10 @@ const registerUser = async (req, res) => {
 
     });
 
+
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 
@@ -96,8 +96,9 @@ const registerUser = async (req, res) => {
 
 
 
+
 // Login
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
 
   try {
 
@@ -110,6 +111,7 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({
       email,
     });
+
 
     if (
       user &&
@@ -136,19 +138,20 @@ const loginUser = async (req, res) => {
 
     }
 
+
     res.status(401).json({
       message: "Invalid email or password",
     });
 
+
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 
 };
+
 
 module.exports = {
   registerUser,
