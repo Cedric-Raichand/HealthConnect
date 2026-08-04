@@ -6,6 +6,7 @@ const authRoutes = require("./routes/authRoutes");
 const appointmentRoutes = require("./routes/appointmentRoutes");
 const medicalRecordRoutes = require("./routes/medicalRecordRoutes");
 const prescriptionRoutes = require("./routes/prescriptionRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 const connectDB = require("./config/db");
 
@@ -27,6 +28,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/medical-records", medicalRecordRoutes);
 app.use("/api/prescriptions", prescriptionRoutes);
+app.use("/api/users", userRoutes);
 
 
 app.get("/", (req, res) => {
