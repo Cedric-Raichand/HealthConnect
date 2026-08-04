@@ -4,7 +4,7 @@ const MedicalRecord = require("../models/MedicalRecord");
 
 
 // Create prescription
-const createPrescription = async (req, res) => {
+const createPrescription = async (req, res, next) => {
   try {
 
     const {
@@ -102,9 +102,7 @@ const createPrescription = async (req, res) => {
 
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
@@ -113,7 +111,7 @@ const createPrescription = async (req, res) => {
 
 
 // Get prescriptions
-const getPrescriptions = async (req, res) => {
+const getPrescriptions = async (req, res, next) => {
   try {
 
     let prescriptions = [];
@@ -161,9 +159,7 @@ const getPrescriptions = async (req, res) => {
 
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
@@ -172,7 +168,7 @@ const getPrescriptions = async (req, res) => {
 
 
 // Get single prescription
-const getPrescriptionById = async (req, res) => {
+const getPrescriptionById = async (req, res, next) => {
   try {
 
     const prescription = await Prescription.findById(req.params.id)
@@ -213,9 +209,7 @@ const getPrescriptionById = async (req, res) => {
 
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
