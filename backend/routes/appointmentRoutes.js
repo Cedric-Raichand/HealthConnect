@@ -4,6 +4,7 @@ const router = express.Router();
 
 const protect = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
+const validate = require("../middleware/validate");
 
 const {
   createAppointment,
@@ -11,13 +12,22 @@ const {
 } = require("../controllers/appointmentController");
 
 
+const {
+  createAppointmentValidator,
+} = require("../middleware/validators/appointmentValidator");
+
+
+
 // Patient books appointment
 router.post(
   "/",
   protect,
   authorizeRoles("patient"),
+  createAppointmentValidator,
+  validate,
   createAppointment
 );
+
 
 
 // Patient, Doctor, Admin view appointments
