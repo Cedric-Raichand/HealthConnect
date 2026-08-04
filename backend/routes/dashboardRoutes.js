@@ -9,7 +9,7 @@ const {
 } = require("../controllers/dashboardController");
 
 
-// Get dashboard statistics
+// Logged-in users get dashboard data
 router.get(
   "/",
   protect,
