@@ -3,53 +3,29 @@ const express = require("express");
 const router = express.Router();
 
 const protect = require("../middleware/authMiddleware");
+const authorizeRoles = require("../middleware/roleMiddleware");
 
 const {
   createAppointment,
   getAppointments,
-  getAppointmentById,
-  updateAppointmentStatus,
-  cancelAppointment,
 } = require("../controllers/appointmentController");
 
 
-// Get all appointments
-router.get(
-  "/",
-  protect,
-  getAppointments
-);
-
-
-// Book appointment
+// Patient books appointment
 router.post(
   "/",
   protect,
+  authorizeRoles("patient"),
   createAppointment
 );
 
 
-// Get single appointment
+// Patient, Doctor, Admin view appointments
 router.get(
-  "/:id",
+  "/",
   protect,
-  getAppointmentById
-);
-
-
-// Update appointment status
-router.patch(
-  "/:id/status",
-  protect,
-  updateAppointmentStatus
-);
-
-
-// Cancel appointment
-router.patch(
-  "/:id/cancel",
-  protect,
-  cancelAppointment
+  authorizeRoles("patient", "doctor", "admin"),
+  getAppointments
 );
 
 
