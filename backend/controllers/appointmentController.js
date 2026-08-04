@@ -1,17 +1,17 @@
 const Appointment = require("../models/Appointment");
 const User = require("../models/User");
 
-// Book appointment (Patient only)
-const createAppointment = async (req, res) => {
-  try {
-    const { doctorId, appointmentDate, reason } = req.body;
 
-    // Only patients can book appointments
-    if (req.user.role !== "patient") {
-      return res.status(403).json({
-        message: "Only patients can book appointments",
-      });
-    }
+// Book appointment
+const createAppointment = async (req, res, next) => {
+  try {
+
+    const {
+      doctorId,
+      appointmentDate,
+      reason
+    } = req.body;
+
 
     // Validate fields
     if (!doctorId || !appointmentDate || !reason) {
@@ -20,8 +20,10 @@ const createAppointment = async (req, res) => {
       });
     }
 
+
     // Check appointment date
     const appointmentTime = new Date(appointmentDate);
+
 
     if (appointmentTime <= new Date()) {
       return res.status(400).json({
@@ -29,17 +31,20 @@ const createAppointment = async (req, res) => {
       });
     }
 
+
     // Check doctor exists
     const doctor = await User.findOne({
       _id: doctorId,
       role: "doctor",
     });
 
+
     if (!doctor) {
       return res.status(404).json({
         message: "Doctor not found",
       });
     }
+
 
     // Prevent double booking
     const existingAppointment = await Appointment.findOne({
@@ -50,38 +55,52 @@ const createAppointment = async (req, res) => {
       },
     });
 
+
     if (existingAppointment) {
       return res.status(400).json({
         message: "Doctor is already booked for this time",
       });
     }
 
+
     const appointment = await Appointment.create({
+
       patient: req.user._id,
+
       doctor: doctorId,
+
       appointmentDate: appointmentTime,
+
       reason,
+
     });
 
+
     res.status(201).json({
+
       message: "Appointment booked successfully",
+
       appointment,
+
     });
+
 
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
 
+
+
+
 // Get all appointments
-const getAppointments = async (req, res) => {
+const getAppointments = async (req, res, next) => {
   try {
 
     let appointments = [];
+
 
     if (req.user.role === "patient") {
 
@@ -91,6 +110,7 @@ const getAppointments = async (req, res) => {
         .populate("doctor", "fullName email phone")
         .sort({ appointmentDate: 1 });
 
+
     } else if (req.user.role === "doctor") {
 
       appointments = await Appointment.find({
@@ -98,6 +118,7 @@ const getAppointments = async (req, res) => {
       })
         .populate("patient", "fullName email phone")
         .sort({ appointmentDate: 1 });
+
 
     } else if (req.user.role === "admin") {
 
@@ -108,33 +129,41 @@ const getAppointments = async (req, res) => {
 
     }
 
+
     res.status(200).json({
+
       count: appointments.length,
+
       appointments,
+
     });
+
 
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
 
+
+
+
 // Get single appointment
-const getAppointmentById = async (req, res) => {
+const getAppointmentById = async (req, res, next) => {
   try {
 
     const appointment = await Appointment.findById(req.params.id)
       .populate("patient", "fullName email phone")
       .populate("doctor", "fullName email phone");
 
+
     if (!appointment) {
       return res.status(404).json({
         message: "Appointment not found",
       });
     }
+
 
     if (
       req.user.role === "patient" &&
@@ -145,6 +174,7 @@ const getAppointmentById = async (req, res) => {
       });
     }
 
+
     if (
       req.user.role === "doctor" &&
       appointment.doctor._id.toString() !== req.user._id.toString()
@@ -154,22 +184,29 @@ const getAppointmentById = async (req, res) => {
       });
     }
 
+
     res.status(200).json(appointment);
+
 
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
 
+
+
+
 // Update appointment status
-const updateAppointmentStatus = async (req, res) => {
+const updateAppointmentStatus = async (req, res, next) => {
   try {
 
-    const { status, notes } = req.body;
+    const {
+      status,
+      notes
+    } = req.body;
+
 
     const allowedStatuses = [
       "pending",
@@ -178,19 +215,23 @@ const updateAppointmentStatus = async (req, res) => {
       "cancelled",
     ];
 
+
     if (!allowedStatuses.includes(status)) {
       return res.status(400).json({
         message: "Invalid appointment status",
       });
     }
 
+
     const appointment = await Appointment.findById(req.params.id);
+
 
     if (!appointment) {
       return res.status(404).json({
         message: "Appointment not found",
       });
     }
+
 
     if (
       req.user.role !== "admin" &&
@@ -201,41 +242,55 @@ const updateAppointmentStatus = async (req, res) => {
       });
     }
 
+
     appointment.status = status;
+
 
     if (notes) {
       appointment.notes = notes;
     }
 
+
     await appointment.save();
 
+
     res.status(200).json({
+
       message: "Appointment updated successfully",
+
       appointment,
+
     });
+
 
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
 
+
+
+
 // Cancel appointment
-const cancelAppointment = async (req, res) => {
+const cancelAppointment = async (req, res, next) => {
   try {
 
-    const { cancelReason } = req.body;
+    const {
+      cancelReason
+    } = req.body;
+
 
     const appointment = await Appointment.findById(req.params.id);
+
 
     if (!appointment) {
       return res.status(404).json({
         message: "Appointment not found",
       });
     }
+
 
     if (
       req.user.role === "patient" &&
@@ -246,24 +301,32 @@ const cancelAppointment = async (req, res) => {
       });
     }
 
+
     appointment.status = "cancelled";
+
     appointment.cancelReason = cancelReason || "";
+
 
     await appointment.save();
 
+
     res.status(200).json({
+
       message: "Appointment cancelled successfully",
+
       appointment,
+
     });
+
 
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
+
+
 
 module.exports = {
   createAppointment,
