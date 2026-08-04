@@ -38,6 +38,80 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
 
+
+    // Patient information
+    dateOfBirth: {
+      type: Date,
+      default: null,
+    },
+
+    gender: {
+      type: String,
+      enum: ["male", "female", "other", ""],
+      default: "",
+    },
+
+    address: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    bloodGroup: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    emergencyContact: {
+      name: {
+        type: String,
+        default: "",
+      },
+
+      phone: {
+        type: String,
+        default: "",
+      },
+
+      relationship: {
+        type: String,
+        default: "",
+      },
+    },
+
+
+    // Doctor information
+    specialization: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    yearsOfExperience: {
+      type: Number,
+      default: 0,
+    },
+
+    licenseNumber: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    hospital: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    bio: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+
     isVerified: {
       type: Boolean,
       default: false,
@@ -47,5 +121,6 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
 
 module.exports = mongoose.model("User", userSchema);
