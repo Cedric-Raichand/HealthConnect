@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 const protect = require("../middleware/authMiddleware");
+const authorizeRoles = require("../middleware/roleMiddleware");
 
 const {
   createMedicalRecord,
@@ -11,26 +12,29 @@ const {
 } = require("../controllers/medicalRecordController");
 
 
-// Create medical record
+// Doctor creates medical records
 router.post(
   "/",
   protect,
+  authorizeRoles("doctor"),
   createMedicalRecord
 );
 
 
-// Get all medical records based on role
+// Patient, Doctor, Admin view records
 router.get(
   "/",
   protect,
+  authorizeRoles("patient", "doctor", "admin"),
   getMedicalRecords
 );
 
 
-// Get single medical record
+// Patient, Doctor, Admin view single record
 router.get(
   "/:id",
   protect,
+  authorizeRoles("patient", "doctor", "admin"),
   getMedicalRecordById
 );
 
