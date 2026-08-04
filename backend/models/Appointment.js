@@ -39,11 +39,24 @@ const appointmentSchema = new mongoose.Schema(
     notes: {
       type: String,
       default: "",
+      trim: true,
+    },
+
+    cancelReason: {
+      type: String,
+      default: "",
+      trim: true,
     },
   },
   {
     timestamps: true,
   }
 );
+
+// Indexes for faster queries
+appointmentSchema.index({ patient: 1 });
+appointmentSchema.index({ doctor: 1 });
+appointmentSchema.index({ appointmentDate: 1 });
+appointmentSchema.index({ doctor: 1, appointmentDate: 1 });
 
 module.exports = mongoose.model("Appointment", appointmentSchema);
