@@ -3,7 +3,7 @@ const User = require("../models/User");
 const MedicalRecord = require("../models/MedicalRecord");
 
 
-// Create prescription (Doctor only)
+// Create prescription
 const createPrescription = async (req, res) => {
   try {
 
@@ -16,14 +16,6 @@ const createPrescription = async (req, res) => {
       duration,
       instructions,
     } = req.body;
-
-
-    // Only doctors can create prescriptions
-    if (req.user.role !== "doctor") {
-      return res.status(403).json({
-        message: "Only doctors can create prescriptions",
-      });
-    }
 
 
     // Validate required fields

@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 const protect = require("../middleware/authMiddleware");
+const authorizeRoles = require("../middleware/roleMiddleware");
 
 const {
   createPrescription,
@@ -11,26 +12,29 @@ const {
 } = require("../controllers/prescriptionController");
 
 
-// Create prescription (Doctor only)
+// Doctor creates prescription
 router.post(
   "/",
   protect,
+  authorizeRoles("doctor"),
   createPrescription
 );
 
 
-// Get prescriptions based on role
+// Patient, Doctor, Admin can view prescriptions
 router.get(
   "/",
   protect,
+  authorizeRoles("patient", "doctor", "admin"),
   getPrescriptions
 );
 
 
-// Get single prescription
+// Patient, Doctor, Admin can view single prescription
 router.get(
   "/:id",
   protect,
+  authorizeRoles("patient", "doctor", "admin"),
   getPrescriptionById
 );
 
