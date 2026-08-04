@@ -15,6 +15,12 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/appointments", appointmentRoutes);
+const medicalRecordRoutes = require("./routes/medicalRecordRoutes");
+
+app.use(
+  "/api/medical-records",
+  medicalRecordRoutes
+);
 
 app.get("/", (req, res) => {
   res.send("HealthConnect API is running...");
