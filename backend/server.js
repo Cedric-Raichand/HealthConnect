@@ -2,7 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const helmet = require("helmet");
-
+const path = require("path");
 
 const authRoutes = require("./routes/authRoutes");
 const appointmentRoutes = require("./routes/appointmentRoutes");
@@ -11,41 +11,31 @@ const prescriptionRoutes = require("./routes/prescriptionRoutes");
 const userRoutes = require("./routes/userRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 
-
 const errorHandler = require("./middleware/errorMiddleware");
-
 
 const {
   apiLimiter,
 } = require("./middleware/rateLimiter");
-
 
 const {
   swaggerUi,
   swaggerSpec,
 } = require("./config/swagger");
 
-
 const connectDB = require("./config/db");
-
-
 
 dotenv.config();
 
-
-
 connectDB();
-
-
 
 const app = express();
 
 
-
-// Security middleware
+// ===============================
+// Security Middleware
+// ===============================
 
 app.use(helmet());
-
 
 app.use(
   cors({
@@ -55,16 +45,24 @@ app.use(
   })
 );
 
-
-
 app.use(express.json());
-
 
 app.use(apiLimiter);
 
 
+// ===============================
+// Static Files
+// ===============================
 
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"))
+);
+
+
+// ===============================
 // Swagger Documentation
+// ===============================
 
 app.use(
   "/api-docs",
@@ -73,8 +71,9 @@ app.use(
 );
 
 
-
-// Routes
+// ===============================
+// API Routes
+// ===============================
 
 app.use("/api/auth", authRoutes);
 
@@ -89,33 +88,28 @@ app.use("/api/users", userRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 
-
-
-
-// Health check route
+// ===============================
+// Health Check
+// ===============================
 
 app.get("/", (req, res) => {
-
   res.send("HealthConnect API is running...");
-
 });
 
 
-
-
-// Global error handler
+// ===============================
+// Global Error Handler
+// ===============================
 
 app.use(errorHandler);
 
 
-
+// ===============================
+// Start Server
+// ===============================
 
 const PORT = process.env.PORT || 5000;
 
-
-
 app.listen(PORT, () => {
-
   console.log(`Server running on port ${PORT}`);
-
 });
