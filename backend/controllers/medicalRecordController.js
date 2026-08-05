@@ -29,21 +29,29 @@ const createMedicalRecord = async (req, res) => {
     }
 
 
-    let document = {};
 
-    if (req.file) {
+    // Store uploaded documents
+    const documents = [];
 
-      document = {
 
-        fileName: req.file.filename,
+    if (req.files && req.files.length > 0) {
 
-        filePath: `/uploads/${req.file.filename}`,
+      req.files.forEach((file) => {
 
-        fileType: req.file.mimetype,
+        documents.push({
 
-      };
+          fileName: file.filename,
+
+          filePath: `/uploads/${file.filename}`,
+
+          fileType: file.mimetype,
+
+        });
+
+      });
 
     }
+
 
 
     const medicalRecord = await MedicalRecord.create({
@@ -60,9 +68,10 @@ const createMedicalRecord = async (req, res) => {
 
       notes,
 
-      document,
+      documents,
 
     });
+
 
 
     res.status(201).json({
@@ -74,6 +83,7 @@ const createMedicalRecord = async (req, res) => {
     });
 
 
+
   } catch (error) {
 
     res.status(500).json({
@@ -82,6 +92,7 @@ const createMedicalRecord = async (req, res) => {
 
   }
 };
+
 
 
 
@@ -103,6 +114,7 @@ const getMedicalRecords = async (req, res) => {
 
     }
 
+
     else if (req.user.role === "doctor") {
 
       records = await MedicalRecord.find({
@@ -112,6 +124,7 @@ const getMedicalRecords = async (req, res) => {
         .sort({ createdAt: -1 });
 
     }
+
 
     else if (req.user.role === "admin") {
 
@@ -123,6 +136,7 @@ const getMedicalRecords = async (req, res) => {
     }
 
 
+
     res.status(200).json({
 
       count: records.length,
@@ -132,6 +146,7 @@ const getMedicalRecords = async (req, res) => {
     });
 
 
+
   } catch (error) {
 
     res.status(500).json({
@@ -140,6 +155,9 @@ const getMedicalRecords = async (req, res) => {
 
   }
 };
+
+
+
 
 
 
@@ -148,16 +166,24 @@ const getMedicalRecords = async (req, res) => {
 const getMedicalRecordById = async (req, res) => {
   try {
 
+
     const record = await MedicalRecord.findById(req.params.id)
       .populate("patient", "fullName email phone")
       .populate("doctor", "fullName email phone");
 
 
+
     if (!record) {
+
       return res.status(404).json({
+
         message: "Medical record not found",
+
       });
+
     }
+
+
 
 
     if (
@@ -165,11 +191,18 @@ const getMedicalRecordById = async (req, res) => {
       record.patient._id.toString() !== req.user._id.toString()
     ) {
 
+
       return res.status(403).json({
+
         message: "Access denied",
+
       });
 
+
     }
+
+
+
 
 
     if (
@@ -177,28 +210,47 @@ const getMedicalRecordById = async (req, res) => {
       record.doctor._id.toString() !== req.user._id.toString()
     ) {
 
+
       return res.status(403).json({
+
         message: "Access denied",
+
       });
 
+
     }
+
+
+
 
 
     res.status(200).json(record);
 
 
+
+
   } catch (error) {
 
+
     res.status(500).json({
+
       message: error.message,
+
     });
+
 
   }
 };
 
 
+
+
 module.exports = {
+
   createMedicalRecord,
+
   getMedicalRecords,
+
   getMedicalRecordById,
+
 };

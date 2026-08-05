@@ -65,7 +65,7 @@ router.post(
   "/",
   protect,
   authorizeRoles("doctor"),
-  upload.single("document"),
+  upload.array("documents", 5),
   createMedicalRecordValidator,
   validate,
   createMedicalRecord

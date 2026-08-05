@@ -38,31 +38,39 @@ const medicalRecordSchema = new mongoose.Schema(
       trim: true,
     },
 
-    // Uploaded medical document
-    document: {
-      fileName: {
-        type: String,
-        default: "",
-      },
 
-      filePath: {
-        type: String,
-        default: "",
-      },
+    // Multiple uploaded documents
+    documents: [
+      {
+        fileName: {
+          type: String,
+          default: "",
+        },
 
-      fileType: {
-        type: String,
-        default: "",
+        filePath: {
+          type: String,
+          default: "",
+        },
+
+        fileType: {
+          type: String,
+          default: "",
+        },
       },
-    },
+    ],
   },
+
   {
     timestamps: true,
   }
 );
 
+
+
 medicalRecordSchema.index({ patient: 1 });
 medicalRecordSchema.index({ doctor: 1 });
+
+
 
 module.exports = mongoose.model(
   "MedicalRecord",
