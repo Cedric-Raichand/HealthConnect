@@ -37,16 +37,32 @@ const medicalRecordSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+
+    // Uploaded medical document
+    document: {
+      fileName: {
+        type: String,
+        default: "",
+      },
+
+      filePath: {
+        type: String,
+        default: "",
+      },
+
+      fileType: {
+        type: String,
+        default: "",
+      },
+    },
   },
   {
     timestamps: true,
   }
 );
 
-
 medicalRecordSchema.index({ patient: 1 });
 medicalRecordSchema.index({ doctor: 1 });
-
 
 module.exports = mongoose.model(
   "MedicalRecord",

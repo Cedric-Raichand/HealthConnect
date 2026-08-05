@@ -4,13 +4,19 @@ const router = express.Router();
 
 const protect = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
+const upload = require("../middleware/uploadMiddleware");
+
+const validate = require("../middleware/validate");
+
+const {
+  createMedicalRecordValidator,
+} = require("../middleware/validators/medicalRecordValidator");
 
 const {
   createMedicalRecord,
   getMedicalRecords,
   getMedicalRecordById,
 } = require("../controllers/medicalRecordController");
-
 
 
 /**
@@ -25,7 +31,7 @@ const {
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -36,19 +42,17 @@ const {
  *             properties:
  *               patientId:
  *                 type: string
- *                 example: 64f123456789abcdef123456
  *               diagnosis:
  *                 type: string
- *                 example: Malaria
  *               symptoms:
  *                 type: string
- *                 example: Fever, headache and body pains
  *               treatment:
  *                 type: string
- *                 example: Artemether-Lumefantrine tablets
  *               notes:
  *                 type: string
- *                 example: Patient should drink plenty of water.
+ *               document:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       201:
  *         description: Medical record created successfully
@@ -61,9 +65,11 @@ router.post(
   "/",
   protect,
   authorizeRoles("doctor"),
+  upload.single("document"),
+  createMedicalRecordValidator,
+  validate,
   createMedicalRecord
 );
-
 
 
 /**
@@ -87,7 +93,6 @@ router.get(
   authorizeRoles("patient", "doctor", "admin"),
   getMedicalRecords
 );
-
 
 
 /**
@@ -118,6 +123,5 @@ router.get(
   authorizeRoles("patient", "doctor", "admin"),
   getMedicalRecordById
 );
-
 
 module.exports = router;
