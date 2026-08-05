@@ -20,6 +20,12 @@ const {
 } = require("./middleware/rateLimiter");
 
 
+const {
+  swaggerUi,
+  swaggerSpec,
+} = require("./config/swagger");
+
+
 const connectDB = require("./config/db");
 
 
@@ -37,6 +43,7 @@ const app = express();
 
 
 // Security middleware
+
 app.use(helmet());
 
 
@@ -57,7 +64,18 @@ app.use(apiLimiter);
 
 
 
+// Swagger Documentation
+
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec)
+);
+
+
+
 // Routes
+
 app.use("/api/auth", authRoutes);
 
 app.use("/api/appointments", appointmentRoutes);
@@ -72,7 +90,10 @@ app.use("/api/dashboard", dashboardRoutes);
 
 
 
+
+
 // Health check route
+
 app.get("/", (req, res) => {
 
   res.send("HealthConnect API is running...");
@@ -81,8 +102,11 @@ app.get("/", (req, res) => {
 
 
 
+
 // Global error handler
+
 app.use(errorHandler);
+
 
 
 
