@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const helmet = require("helmet");
 
+
 const authRoutes = require("./routes/authRoutes");
 const appointmentRoutes = require("./routes/appointmentRoutes");
 const medicalRecordRoutes = require("./routes/medicalRecordRoutes");
@@ -10,7 +11,9 @@ const prescriptionRoutes = require("./routes/prescriptionRoutes");
 const userRoutes = require("./routes/userRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 
+
 const errorHandler = require("./middleware/errorMiddleware");
+
 
 const {
   apiLimiter,
@@ -20,21 +23,35 @@ const {
 const connectDB = require("./config/db");
 
 
+
 dotenv.config();
 
 
+
 connectDB();
+
 
 
 const app = express();
 
 
 
+// Security middleware
 app.use(helmet());
 
-app.use(cors());
+
+app.use(
+  cors({
+    origin:
+      process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+
 
 app.use(express.json());
+
 
 app.use(apiLimiter);
 
@@ -55,6 +72,7 @@ app.use("/api/dashboard", dashboardRoutes);
 
 
 
+// Health check route
 app.get("/", (req, res) => {
 
   res.send("HealthConnect API is running...");
@@ -63,12 +81,13 @@ app.get("/", (req, res) => {
 
 
 
-// Error handling middleware
+// Global error handler
 app.use(errorHandler);
 
 
 
 const PORT = process.env.PORT || 5000;
+
 
 
 app.listen(PORT, () => {
