@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const helmet = require("helmet");
 
 const authRoutes = require("./routes/authRoutes");
 const appointmentRoutes = require("./routes/appointmentRoutes");
@@ -21,7 +22,7 @@ connectDB();
 
 const app = express();
 
-
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
