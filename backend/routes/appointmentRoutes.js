@@ -6,6 +6,7 @@ const protect = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
 
 const validate = require("../middleware/validate");
+const validateObjectId = require("../middleware/validateObjectId");
 
 const {
   createAppointment,
@@ -59,6 +60,7 @@ router.get(
   "/:id",
   protect,
   authorizeRoles("patient", "doctor", "admin"),
+  validateObjectId("id", "appointment"),
   getAppointmentById
 );
 
@@ -72,6 +74,7 @@ router.patch(
   "/:id/status",
   protect,
   authorizeRoles("doctor", "admin"),
+  validateObjectId("id", "appointment"),
   updateAppointmentValidator,
   validate,
   updateAppointmentStatus
@@ -87,6 +90,7 @@ router.patch(
   "/:id/cancel",
   protect,
   authorizeRoles("patient", "doctor", "admin"),
+  validateObjectId("id", "appointment"),
   cancelAppointmentValidator,
   validate,
   cancelAppointment
