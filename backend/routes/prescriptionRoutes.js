@@ -4,8 +4,7 @@ const router = express.Router();
 
 const protect = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-
-const validate = require("../middleware/validate");
+const validateObjectId = require("../middleware/validateObjectId");
 
 const {
   createPrescription,
@@ -13,23 +12,25 @@ const {
   getPrescriptionById,
 } = require("../controllers/prescriptionController");
 
-const {
-  createPrescriptionValidator,
-} = require("../middleware/validators/prescriptionValidator");
 
+// ==========================================
+// CREATE PRESCRIPTION
+// Doctor only
+// ==========================================
 
-// Doctor creates prescription
 router.post(
   "/",
   protect,
   authorizeRoles("doctor"),
-  createPrescriptionValidator,
-  validate,
   createPrescription
 );
 
 
-// Patient, Doctor, Admin can view prescriptions
+// ==========================================
+// GET ALL PRESCRIPTIONS
+// Patient, Doctor, Admin
+// ==========================================
+
 router.get(
   "/",
   protect,
@@ -38,11 +39,16 @@ router.get(
 );
 
 
-// Patient, Doctor, Admin can view single prescription
+// ==========================================
+// GET SINGLE PRESCRIPTION
+// Patient, Doctor, Admin
+// ==========================================
+
 router.get(
   "/:id",
   protect,
   authorizeRoles("patient", "doctor", "admin"),
+  validateObjectId("id", "prescription"),
   getPrescriptionById
 );
 
