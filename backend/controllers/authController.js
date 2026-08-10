@@ -7,7 +7,7 @@ const generateToken = require("../utils/generateToken");
 // REGISTER USER
 // ==========================================
 
-const registerUser = async (req, res) => {
+const registerUser = async (req, res, next) => {
   try {
 
     const {
@@ -76,12 +76,9 @@ const registerUser = async (req, res) => {
 
     });
 
-
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
@@ -92,7 +89,7 @@ const registerUser = async (req, res) => {
 // LOGIN USER
 // ==========================================
 
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
   try {
 
     const {
@@ -138,12 +135,9 @@ const loginUser = async (req, res) => {
       message: "Invalid email or password",
     });
 
-
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
