@@ -10,7 +10,10 @@ const {
 } = require("../controllers/userController");
 
 
-// Get logged-in user profile
+// ==========================================
+// GET LOGGED-IN USER PROFILE
+// ==========================================
+
 router.get(
   "/profile",
   protect,
@@ -18,7 +21,10 @@ router.get(
 );
 
 
-// Update logged-in user profile
+// ==========================================
+// UPDATE LOGGED-IN USER PROFILE
+// ==========================================
+
 router.put(
   "/profile",
   protect,
