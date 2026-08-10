@@ -6,6 +6,7 @@ const protect = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
 const upload = require("../middleware/uploadmiddleware");
 const validate = require("../middleware/validate");
+const validateObjectId = require("../middleware/validateObjectId");
 
 const {
   createMedicalRecord,
@@ -56,6 +57,7 @@ router.get(
   "/:id",
   protect,
   authorizeRoles("patient", "doctor", "admin"),
+  validateObjectId("id", "medical record"),
   getMedicalRecordById
 );
 
