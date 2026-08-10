@@ -3,53 +3,44 @@ const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 
 
-// Register
-const registerUser = async (req, res, next) => {
+// ==========================================
+// REGISTER USER
+// ==========================================
 
+const registerUser = async (req, res) => {
   try {
 
     const {
       fullName,
       email,
       password,
-      role,
       phone,
     } = req.body;
 
 
-    if (
-      !fullName ||
-      !email ||
-      !password
-    ) {
-
-      return res.status(400).json({
-        message: "Please fill all required fields",
-      });
-
-    }
-
-
+    // Check if user already exists
     const userExists = await User.findOne({
       email,
     });
 
 
     if (userExists) {
-
       return res.status(400).json({
         message: "User already exists",
       });
-
     }
 
 
+    // Hash password
     const salt = await bcrypt.genSalt(10);
 
-    const hashedPassword =
-      await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(
+      password,
+      salt
+    );
 
 
+    // Public registration always creates a patient
     const user = await User.create({
 
       fullName,
@@ -58,7 +49,7 @@ const registerUser = async (req, res, next) => {
 
       password: hashedPassword,
 
-      role: role || "patient",
+      role: "patient",
 
       phone,
 
@@ -88,18 +79,20 @@ const registerUser = async (req, res, next) => {
 
   } catch (error) {
 
-    next(error);
+    res.status(500).json({
+      message: error.message,
+    });
 
   }
-
 };
 
 
 
+// ==========================================
+// LOGIN USER
+// ==========================================
 
-// Login
-const loginUser = async (req, res, next) => {
-
+const loginUser = async (req, res) => {
   try {
 
     const {
@@ -118,7 +111,9 @@ const loginUser = async (req, res, next) => {
       await bcrypt.compare(password, user.password)
     ) {
 
-      return res.json({
+      return res.status(200).json({
+
+        message: "Login successful",
 
         token: generateToken(user._id),
 
@@ -139,18 +134,20 @@ const loginUser = async (req, res, next) => {
     }
 
 
-    res.status(401).json({
+    return res.status(401).json({
       message: "Invalid email or password",
     });
 
 
   } catch (error) {
 
-    next(error);
+    res.status(500).json({
+      message: error.message,
+    });
 
   }
-
 };
+
 
 
 module.exports = {
