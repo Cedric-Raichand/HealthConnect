@@ -2,8 +2,12 @@ const MedicalRecord = require("../models/MedicalRecord");
 const User = require("../models/User");
 
 
-// Create medical record (Doctor only)
-const createMedicalRecord = async (req, res) => {
+// ==========================================
+// CREATE MEDICAL RECORD
+// Doctor only
+// ==========================================
+
+const createMedicalRecord = async (req, res, next) => {
   try {
 
     const {
@@ -29,7 +33,6 @@ const createMedicalRecord = async (req, res) => {
     }
 
 
-
     // Store uploaded documents
     const documents = [];
 
@@ -53,7 +56,6 @@ const createMedicalRecord = async (req, res) => {
     }
 
 
-
     const medicalRecord = await MedicalRecord.create({
 
       patient: patientId,
@@ -73,7 +75,6 @@ const createMedicalRecord = async (req, res) => {
     });
 
 
-
     res.status(201).json({
 
       message: "Medical record created successfully",
@@ -83,27 +84,26 @@ const createMedicalRecord = async (req, res) => {
     });
 
 
-
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
 
 
 
+// ==========================================
+// GET MEDICAL RECORDS
+// ==========================================
 
-
-// Get medical records
-const getMedicalRecords = async (req, res) => {
+const getMedicalRecords = async (req, res, next) => {
   try {
 
     let records = [];
 
 
+    // Patient
     if (req.user.role === "patient") {
 
       records = await MedicalRecord.find({
@@ -115,6 +115,7 @@ const getMedicalRecords = async (req, res) => {
     }
 
 
+    // Doctor
     else if (req.user.role === "doctor") {
 
       records = await MedicalRecord.find({
@@ -126,6 +127,7 @@ const getMedicalRecords = async (req, res) => {
     }
 
 
+    // Admin
     else if (req.user.role === "admin") {
 
       records = await MedicalRecord.find()
@@ -134,7 +136,6 @@ const getMedicalRecords = async (req, res) => {
         .sort({ createdAt: -1 });
 
     }
-
 
 
     res.status(200).json({
@@ -146,31 +147,25 @@ const getMedicalRecords = async (req, res) => {
     });
 
 
-
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
 
   }
 };
 
 
 
+// ==========================================
+// GET SINGLE MEDICAL RECORD
+// ==========================================
 
-
-
-
-// Get single medical record
-const getMedicalRecordById = async (req, res) => {
+const getMedicalRecordById = async (req, res, next) => {
   try {
-
 
     const record = await MedicalRecord.findById(req.params.id)
       .populate("patient", "fullName email phone")
       .populate("doctor", "fullName email phone");
-
 
 
     if (!record) {
@@ -184,64 +179,45 @@ const getMedicalRecordById = async (req, res) => {
     }
 
 
-
-
+    // Patient can only access their own record
     if (
       req.user.role === "patient" &&
       record.patient._id.toString() !== req.user._id.toString()
     ) {
 
-
       return res.status(403).json({
 
         message: "Access denied",
 
       });
 
-
     }
 
 
-
-
-
+    // Doctor can only access their own records
     if (
       req.user.role === "doctor" &&
       record.doctor._id.toString() !== req.user._id.toString()
     ) {
 
-
       return res.status(403).json({
 
         message: "Access denied",
 
       });
 
-
     }
-
-
-
 
 
     res.status(200).json(record);
 
 
-
-
   } catch (error) {
 
-
-    res.status(500).json({
-
-      message: error.message,
-
-    });
-
+    next(error);
 
   }
 };
-
 
 
 
