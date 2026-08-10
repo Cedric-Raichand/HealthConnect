@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
+    // ==========================================
+    // BASIC USER INFORMATION
+    // ==========================================
+
     fullName: {
       type: String,
       required: true,
@@ -39,7 +43,10 @@ const userSchema = new mongoose.Schema(
     },
 
 
-    // Patient information
+    // ==========================================
+    // PATIENT INFORMATION
+    // ==========================================
+
     dateOfBirth: {
       type: Date,
       default: null,
@@ -81,7 +88,10 @@ const userSchema = new mongoose.Schema(
     },
 
 
-    // Doctor information
+    // ==========================================
+    // DOCTOR INFORMATION
+    // ==========================================
+
     specialization: {
       type: String,
       default: "",
@@ -111,6 +121,10 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
+
+    // ==========================================
+    // ACCOUNT VERIFICATION
+    // ==========================================
 
     isVerified: {
       type: Boolean,
