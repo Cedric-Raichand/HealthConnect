@@ -3,73 +3,95 @@ const errorHandler = (err, req, res, next) => {
   console.error(err.stack);
 
 
+  // ==========================================
+  // MONGOOSE INVALID OBJECT ID
+  // ==========================================
 
-  let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-
-  let message = err.message;
-
-
-
-  // MongoDB duplicate key error
-  if (err.code === 11000) {
-
-    statusCode = 400;
-
-    const field = Object.keys(err.keyValue)[0];
-
-    message = `${field} already exists`;
-
-  }
-
-
-
-  // Invalid MongoDB ObjectId
   if (err.name === "CastError") {
 
-    statusCode = 400;
-
-    message = "Invalid resource ID";
-
-  }
-
-
-
-  // JWT invalid token
-  if (err.name === "JsonWebTokenError") {
-
-    statusCode = 401;
-
-    message = "Invalid token";
+    return res.status(400).json({
+      message: `Invalid ${err.path} provided`,
+    });
 
   }
 
 
+  // ==========================================
+  // MONGOOSE VALIDATION ERROR
+  // ==========================================
 
-  // JWT expired token
-  if (err.name === "TokenExpiredError") {
+  if (err.name === "ValidationError") {
 
-    statusCode = 401;
+    const errors = Object.values(err.errors).map(
+      (error) => error.message
+    );
 
-    message = "Token expired, please login again";
+    return res.status(400).json({
+      message: "Validation failed",
+      errors,
+    });
 
   }
 
+
+  // ==========================================
+  // MONGOOSE DUPLICATE KEY
+  // ==========================================
+
+  if (err.code === 11000) {
+
+    const field = Object.keys(err.keyPattern)[0];
+
+    return res.status(400).json({
+      message: `${field} already exists`,
+    });
+
+  }
+
+
+  // ==========================================
+  // MULTER FILE SIZE ERROR
+  // ==========================================
+
+  if (err.code === "LIMIT_FILE_SIZE") {
+
+    return res.status(400).json({
+      message: "File size cannot exceed 5MB",
+    });
+
+  }
+
+
+  // ==========================================
+  // MULTER TOO MANY FILES
+  // ==========================================
+
+  if (err.code === "LIMIT_UNEXPECTED_FILE") {
+
+    return res.status(400).json({
+      message: "Too many files uploaded",
+    });
+
+  }
+
+
+  // ==========================================
+  // DEFAULT SERVER ERROR
+  // ==========================================
+
+  const statusCode = res.statusCode >= 400
+    ? res.statusCode
+    : 500;
 
 
   res.status(statusCode).json({
 
-    success: false,
-
-    message,
-
-    ...(process.env.NODE_ENV === "development" && {
-      stack: err.stack,
-    }),
+    message:
+      err.message || "Internal server error",
 
   });
 
 };
-
 
 
 module.exports = errorHandler;
