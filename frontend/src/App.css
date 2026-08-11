@@ -123,3 +123,146 @@ a {
   color: #168f72;
   font-weight: 600;
 }
+
+.dashboard-page {
+  min-height: 100vh;
+  background: #f5f7fb;
+}
+
+.dashboard-header {
+  min-height: 75px;
+  padding: 0 6%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e8ebf0;
+}
+
+.dashboard-logo {
+  font-size: 25px;
+  font-weight: 800;
+  color: #172033;
+}
+
+.dashboard-logo span {
+  color: #168f72;
+}
+
+.dashboard-user {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.dashboard-user div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.dashboard-user strong {
+  font-size: 14px;
+}
+
+.dashboard-user span {
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: capitalize;
+}
+
+.logout-button {
+  padding: 9px 16px;
+  border: 1px solid #d9dee8;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.logout-button:hover {
+  background: #f5f7fb;
+}
+
+.dashboard-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 25px;
+}
+
+.dashboard-welcome {
+  margin-bottom: 45px;
+}
+
+.dashboard-welcome h1 {
+  margin: 8px 0;
+  font-size: 38px;
+}
+
+.dashboard-welcome p:last-child {
+  color: #6b7280;
+}
+
+.eyebrow {
+  color: #168f72;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+}
+
+.dashboard-card {
+  position: relative;
+  padding: 30px;
+  min-height: 190px;
+  background: white;
+  border: 1px solid #e8ebf0;
+  border-radius: 16px;
+  color: #172033;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.07);
+}
+
+.dashboard-card-number {
+  font-size: 12px;
+  font-weight: 800;
+  color: #168f72;
+}
+
+.dashboard-card h2 {
+  margin: 18px 0 8px;
+  font-size: 22px;
+}
+
+.dashboard-card p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+@media (max-width: 700px) {
+  .dashboard-header {
+    padding: 15px 20px;
+  }
+
+  .dashboard-user div {
+    display: none;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-welcome h1 {
+    font-size: 30px;
+  }
+}
