@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import Appointments from "./pages/Appointments";
 
 function Placeholder({ title }) {
   return <h1>{title}</h1>;
@@ -28,8 +29,8 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
 
           <Route
-            path="/appointments"
-            element={<Placeholder title="Appointments" />}
+             path="/appointments"
+             element={<Appointments />}
           />
 
           <Route
