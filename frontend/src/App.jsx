@@ -6,6 +6,8 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+
 function Placeholder({ title }) {
   return <h1>{title}</h1>;
 }
@@ -14,33 +16,37 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<Home />} />
 
         <Route path="/login" element={<Login />} />
 
         <Route path="/register" element={<Register />} />
 
-        <Route path="/dashboard" element={<Dashboard />} />
+        {/* Protected routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
 
-        <Route
-          path="/appointments"
-          element={<Placeholder title="Appointments" />}
-        />
+          <Route
+            path="/appointments"
+            element={<Placeholder title="Appointments" />}
+          />
 
-        <Route
-          path="/medical-records"
-          element={<Placeholder title="Medical Records" />}
-        />
+          <Route
+            path="/medical-records"
+            element={<Placeholder title="Medical Records" />}
+          />
 
-        <Route
-          path="/prescriptions"
-          element={<Placeholder title="Prescriptions" />}
-        />
+          <Route
+            path="/prescriptions"
+            element={<Placeholder title="Prescriptions" />}
+          />
 
-        <Route
-          path="/profile"
-          element={<Placeholder title="My Profile" />}
-        />
+          <Route
+            path="/profile"
+            element={<Placeholder title="My Profile" />}
+          />
+        </Route>
 
         <Route path="*" element={<NotFound />} />
       </Routes>
