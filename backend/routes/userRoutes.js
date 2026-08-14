@@ -7,8 +7,8 @@ const protect = require("../middleware/authMiddleware");
 const {
   getProfile,
   updateProfile,
+  getDoctors,
 } = require("../controllers/userController");
-
 
 // ==========================================
 // GET LOGGED-IN USER PROFILE
@@ -20,7 +20,6 @@ router.get(
   getProfile
 );
 
-
 // ==========================================
 // UPDATE LOGGED-IN USER PROFILE
 // ==========================================
@@ -31,5 +30,14 @@ router.put(
   updateProfile
 );
 
+// ==========================================
+// GET ALL DOCTORS
+// ==========================================
+
+router.get(
+  "/doctors",
+  protect,
+  getDoctors
+);
 
 module.exports = router;
