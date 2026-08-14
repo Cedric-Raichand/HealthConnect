@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Appointments from "./pages/Appointments";
 import Profile from "./pages/Profile";
+import MedicalRecords from "./pages/MedicalRecords";
 
 function Placeholder({ title }) {
   return <h1>{title}</h1>;
@@ -19,9 +20,9 @@ function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* =========================
-            PUBLIC ROUTES
-        ========================== */}
+        {/* ============================= */}
+        {/* PUBLIC ROUTES */}
+        {/* ============================= */}
 
         <Route path="/" element={<Home />} />
 
@@ -30,9 +31,9 @@ function App() {
         <Route path="/register" element={<Register />} />
 
 
-        {/* =========================
-            PROTECTED ROUTES
-        ========================== */}
+        {/* ============================= */}
+        {/* PROTECTED ROUTES */}
+        {/* ============================= */}
 
         <Route element={<ProtectedRoute />}>
 
@@ -47,10 +48,8 @@ function App() {
           />
 
           <Route
-            path="/medical-records"
-            element={
-              <Placeholder title="Medical Records" />
-            }
+           path="/medical-records"
+           element={<MedicalRecords />}
           />
 
           <Route
@@ -68,9 +67,9 @@ function App() {
         </Route>
 
 
-        {/* =========================
-            404 ROUTE
-        ========================== */}
+        {/* ============================= */}
+        {/* 404 ROUTE */}
+        {/* ============================= */}
 
         <Route
           path="*"

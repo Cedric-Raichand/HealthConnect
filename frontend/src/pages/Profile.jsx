@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
-import { useAuth } from "../context/AuthContext";
 
 function Profile() {
-  const { user, setUser } = useAuth();
-
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -26,49 +23,55 @@ function Profile() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // ==========================================
+  // GET PROFILE
+  // ==========================================
+
   useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await api.get("/users/profile");
+
+        const user = response.data;
+
+        setFormData({
+          fullName: user.fullName || "",
+          email: user.email || "",
+          phone: user.phone || "",
+          dateOfBirth: user.dateOfBirth
+            ? user.dateOfBirth.split("T")[0]
+            : "",
+          gender: user.gender || "",
+          address: user.address || "",
+          bloodGroup: user.bloodGroup || "",
+          emergencyContact: {
+            name: user.emergencyContact?.name || "",
+            phone: user.emergencyContact?.phone || "",
+            relationship:
+              user.emergencyContact?.relationship || "",
+          },
+        });
+      } catch (error) {
+        console.error("Profile error:", error);
+
+        setError(
+          error.response?.data?.message ||
+            "Unable to load your profile."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchProfile();
   }, []);
 
-  const fetchProfile = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const response = await api.get("/users/profile");
-
-      const profile = response.data;
-
-      setFormData({
-        fullName: profile.fullName || "",
-        email: profile.email || "",
-        phone: profile.phone || "",
-        dateOfBirth: profile.dateOfBirth
-          ? new Date(profile.dateOfBirth)
-              .toISOString()
-              .split("T")[0]
-          : "",
-        gender: profile.gender || "",
-        address: profile.address || "",
-        bloodGroup: profile.bloodGroup || "",
-        emergencyContact: {
-          name: profile.emergencyContact?.name || "",
-          phone: profile.emergencyContact?.phone || "",
-          relationship:
-            profile.emergencyContact?.relationship || "",
-        },
-      });
-    } catch (error) {
-      console.error("Profile error:", error);
-
-      setError(
-        error.response?.data?.message ||
-          "Unable to load your profile."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  // ==========================================
+  // HANDLE NORMAL INPUTS
+  // ==========================================
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -78,6 +81,10 @@ function Profile() {
       [name]: value,
     }));
   };
+
+  // ==========================================
+  // HANDLE EMERGENCY CONTACT
+  // ==========================================
 
   const handleEmergencyChange = (e) => {
     const { name, value } = e.target;
@@ -91,58 +98,45 @@ function Profile() {
     }));
   };
 
+  // ==========================================
+  // SAVE PROFILE
+  // ==========================================
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     setError("");
     setSuccess("");
 
-    if (!formData.fullName || !formData.phone) {
-      setError(
-        "Full name and phone number are required."
-      );
-      return;
-    }
-
     try {
       setSaving(true);
 
-      const response = await api.put("/users/profile", {
-        fullName: formData.fullName,
-        phone: formData.phone,
-        dateOfBirth: formData.dateOfBirth || null,
-        gender: formData.gender,
-        address: formData.address,
-        bloodGroup: formData.bloodGroup,
-        emergencyContact: formData.emergencyContact,
-      });
-
-      setSuccess(
-        response.data.message ||
-          "Profile updated successfully."
+      const response = await api.put(
+        "/users/profile",
+        {
+          fullName: formData.fullName,
+          phone: formData.phone,
+          dateOfBirth: formData.dateOfBirth || null,
+          gender: formData.gender,
+          address: formData.address,
+          bloodGroup: formData.bloodGroup,
+          emergencyContact: formData.emergencyContact,
+        }
       );
 
-      // Update the basic user information stored
-      // in AuthContext/localStorage.
-      if (response.data.user) {
-        const updatedUser = {
-          ...user,
-          ...response.data.user,
-        };
+      console.log(
+        "Profile updated:",
+        response.data
+      );
 
-        localStorage.setItem(
-          "user",
-          JSON.stringify(updatedUser)
-        );
-
-        if (setUser) {
-          setUser(updatedUser);
-        }
-      }
-
-      await fetchProfile();
+      setSuccess(
+        "Profile updated successfully!"
+      );
     } catch (error) {
-      console.error("Profile update error:", error);
+      console.error(
+        "Update profile error:",
+        error
+      );
 
       setError(
         error.response?.data?.message ||
@@ -152,6 +146,10 @@ function Profile() {
       setSaving(false);
     }
   };
+
+  // ==========================================
+  // LOADING
+  // ==========================================
 
   if (loading) {
     return (
@@ -181,6 +179,10 @@ function Profile() {
     );
   }
 
+  // ==========================================
+  // PAGE
+  // ==========================================
+
   return (
     <div className="dashboard-page">
       <header className="dashboard-header">
@@ -200,8 +202,13 @@ function Profile() {
       </header>
 
       <main className="dashboard-content">
+
+        {/* HEADER */}
+
         <section className="dashboard-welcome">
-          <p className="eyebrow">HEALTHCARE</p>
+          <p className="eyebrow">
+            HEALTHCARE
+          </p>
 
           <h1>My Profile</h1>
 
@@ -211,24 +218,30 @@ function Profile() {
           </p>
         </section>
 
-        <section className="profile-section">
+        {/* PROFILE FORM */}
+
+        <section className="booking-section">
+
+          <h2>Personal Information</h2>
+
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="success-message">
+              {success}
+            </div>
+          )}
+
           <form
             onSubmit={handleSubmit}
-            className="profile-form"
+            className="booking-form"
           >
-            {error && (
-              <div className="error-message">
-                {error}
-              </div>
-            )}
 
-            {success && (
-              <div className="success-message">
-                {success}
-              </div>
-            )}
-
-            <h2>Personal Information</h2>
+            {/* FULL NAME */}
 
             <div className="form-group">
               <label htmlFor="fullName">
@@ -241,9 +254,11 @@ function Profile() {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
-                placeholder="Your full name"
+                required
               />
             </div>
+
+            {/* EMAIL */}
 
             <div className="form-group">
               <label htmlFor="email">
@@ -263,6 +278,8 @@ function Profile() {
               </small>
             </div>
 
+            {/* PHONE */}
+
             <div className="form-group">
               <label htmlFor="phone">
                 Phone Number
@@ -272,11 +289,13 @@ function Profile() {
                 id="phone"
                 type="tel"
                 name="phone"
+                placeholder="0241234567"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder="0240000000"
               />
             </div>
+
+            {/* DATE OF BIRTH */}
 
             <div className="form-group">
               <label htmlFor="dateOfBirth">
@@ -291,6 +310,8 @@ function Profile() {
                 onChange={handleChange}
               />
             </div>
+
+            {/* GENDER */}
 
             <div className="form-group">
               <label htmlFor="gender">
@@ -321,6 +342,8 @@ function Profile() {
               </select>
             </div>
 
+            {/* ADDRESS */}
+
             <div className="form-group">
               <label htmlFor="address">
                 Address
@@ -330,11 +353,13 @@ function Profile() {
                 id="address"
                 name="address"
                 rows="3"
+                placeholder="Your residential address"
                 value={formData.address}
                 onChange={handleChange}
-                placeholder="Your residential address"
               />
             </div>
+
+            {/* BLOOD GROUP */}
 
             <div className="form-group">
               <label htmlFor="bloodGroup">
@@ -362,7 +387,11 @@ function Profile() {
               </select>
             </div>
 
-            <h2>Emergency Contact</h2>
+            {/* EMERGENCY CONTACT */}
+
+            <h2>
+              Emergency Contact
+            </h2>
 
             <div className="form-group">
               <label htmlFor="emergencyName">
@@ -373,11 +402,11 @@ function Profile() {
                 id="emergencyName"
                 type="text"
                 name="name"
+                placeholder="Emergency contact name"
                 value={
                   formData.emergencyContact.name
                 }
                 onChange={handleEmergencyChange}
-                placeholder="Emergency contact name"
               />
             </div>
 
@@ -390,31 +419,33 @@ function Profile() {
                 id="emergencyPhone"
                 type="tel"
                 name="phone"
+                placeholder="Emergency contact phone"
                 value={
                   formData.emergencyContact.phone
                 }
                 onChange={handleEmergencyChange}
-                placeholder="Emergency contact phone"
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="emergencyRelationship">
+              <label htmlFor="relationship">
                 Relationship
               </label>
 
               <input
-                id="emergencyRelationship"
+                id="relationship"
                 type="text"
                 name="relationship"
+                placeholder="e.g. Mother, Father, Spouse"
                 value={
                   formData.emergencyContact
                     .relationship
                 }
                 onChange={handleEmergencyChange}
-                placeholder="e.g. Mother, Father, Spouse"
               />
             </div>
+
+            {/* SAVE */}
 
             <button
               type="submit"
@@ -425,6 +456,7 @@ function Profile() {
                 ? "Saving..."
                 : "Save Profile"}
             </button>
+
           </form>
         </section>
       </main>
