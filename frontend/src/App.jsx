@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import Appointments from "./pages/Appointments";
+import Profile from "./pages/Profile";
 
 function Placeholder({ title }) {
   return <h1>{title}</h1>;
@@ -17,39 +18,65 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public routes */}
+
+        {/* =========================
+            PUBLIC ROUTES
+        ========================== */}
+
         <Route path="/" element={<Home />} />
 
         <Route path="/login" element={<Login />} />
 
         <Route path="/register" element={<Register />} />
 
-        {/* Protected routes */}
+
+        {/* =========================
+            PROTECTED ROUTES
+        ========================== */}
+
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
 
           <Route
-             path="/appointments"
-             element={<Appointments />}
+            path="/dashboard"
+            element={<Dashboard />}
+          />
+
+          <Route
+            path="/appointments"
+            element={<Appointments />}
           />
 
           <Route
             path="/medical-records"
-            element={<Placeholder title="Medical Records" />}
+            element={
+              <Placeholder title="Medical Records" />
+            }
           />
 
           <Route
             path="/prescriptions"
-            element={<Placeholder title="Prescriptions" />}
+            element={
+              <Placeholder title="Prescriptions" />
+            }
           />
 
           <Route
             path="/profile"
-            element={<Placeholder title="My Profile" />}
+            element={<Profile />}
           />
+
         </Route>
 
-        <Route path="*" element={<NotFound />} />
+
+        {/* =========================
+            404 ROUTE
+        ========================== */}
+
+        <Route
+          path="*"
+          element={<NotFound />}
+        />
+
       </Routes>
     </BrowserRouter>
   );

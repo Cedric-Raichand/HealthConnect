@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+
 import api from "../services/api";
 
 const AuthContext = createContext();
@@ -7,21 +13,26 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  const storedUser = localStorage.getItem("user");
-  const token = localStorage.getItem("token");
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
 
-  if (storedUser && token) {
-    try {
-      setUser(JSON.parse(storedUser));
-    } catch (error) {
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
+    if (storedUser && token) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error(
+          "Unable to restore user:",
+          error
+        );
+
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+      }
     }
-  }
 
-  setLoading(false);
-}, []);
+    setLoading(false);
+  }, []);
 
   const login = async (email, password) => {
     const response = await api.post("/auth/login", {
@@ -32,14 +43,22 @@ useEffect(() => {
     const { token, user } = response.data;
 
     localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem(
+      "user",
+      JSON.stringify(user)
+    );
 
     setUser(user);
 
     return user;
   };
 
-  const register = async (fullName, email, password, phone) => {
+  const register = async (
+    fullName,
+    email,
+    password,
+    phone
+  ) => {
     const response = await api.post("/auth/register", {
       fullName,
       email,
@@ -50,7 +69,10 @@ useEffect(() => {
     const { token, user } = response.data;
 
     localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem(
+      "user",
+      JSON.stringify(user)
+    );
 
     setUser(user);
 
@@ -68,6 +90,7 @@ useEffect(() => {
     <AuthContext.Provider
       value={{
         user,
+        setUser,
         loading,
         login,
         register,
