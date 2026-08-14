@@ -105,6 +105,12 @@ function Appointments() {
       formData.appointmentDate
     );
 
+    // Make sure appointment is valid
+    if (Number.isNaN(selectedDate.getTime())) {
+      setError("Please select a valid appointment date.");
+      return;
+    }
+
     // Make sure appointment is in the future
     if (selectedDate <= new Date()) {
       setError(
@@ -154,20 +160,37 @@ function Appointments() {
       await fetchAppointments();
 
     } catch (error) {
-      console.error(
-        "Booking error:",
-        error
-      );
+      console.error("Booking error:", error);
 
+      // Show the COMPLETE backend response
       console.log(
         "Backend response:",
-        error.response?.data
+        JSON.stringify(
+          error.response?.data,
+          null,
+          2
+        )
       );
 
-      setError(
-        error.response?.data?.message ||
-          "Unable to book appointment."
-      );
+      // Get validation errors if backend returned them
+      const backendErrors =
+        error.response?.data?.errors;
+
+      if (Array.isArray(backendErrors) && backendErrors.length > 0) {
+        const firstError = backendErrors[0];
+
+        setError(
+          firstError.message ||
+            firstError.msg ||
+            "Appointment validation failed."
+        );
+      } else {
+        setError(
+          error.response?.data?.message ||
+            "Unable to book appointment."
+        );
+      }
+
     } finally {
       setBooking(false);
     }
@@ -214,7 +237,6 @@ function Appointments() {
 
       </header>
 
-
       <main className="dashboard-content">
 
         {/* PAGE INTRO */}
@@ -234,7 +256,6 @@ function Appointments() {
           </p>
 
         </section>
-
 
         {/* ==========================================
             BOOK APPOINTMENT
@@ -258,7 +279,6 @@ function Appointments() {
               </div>
             )}
 
-
             {/* SUCCESS */}
             {success && (
               <div className="success-message">
@@ -266,14 +286,12 @@ function Appointments() {
               </div>
             )}
 
-
             {/* DOCTOR ERROR */}
             {doctorsError && (
               <div className="error-message">
                 {doctorsError}
               </div>
             )}
-
 
             {/* DOCTOR */}
             <div className="form-group">
@@ -315,7 +333,6 @@ function Appointments() {
 
             </div>
 
-
             {/* DATE */}
             <div className="form-group">
 
@@ -329,13 +346,14 @@ function Appointments() {
                 name="appointmentDate"
                 value={formData.appointmentDate}
                 onChange={handleChange}
-                min={new Date()
-                  .toISOString()
-                  .slice(0, 16)}
+                min={
+                  new Date()
+                    .toISOString()
+                    .slice(0, 16)
+                }
               />
 
             </div>
-
 
             {/* REASON */}
             <div className="form-group">
@@ -355,7 +373,6 @@ function Appointments() {
 
             </div>
 
-
             {/* SUBMIT */}
             <button
               type="submit"
@@ -365,17 +382,14 @@ function Appointments() {
                 doctors.length === 0
               }
             >
-
               {booking
                 ? "Booking..."
                 : "Book Appointment"}
-
             </button>
 
           </form>
 
         </section>
-
 
         {/* ==========================================
             APPOINTMENT LIST
@@ -387,14 +401,12 @@ function Appointments() {
             My Appointments
           </h2>
 
-
           {/* LOADING */}
           {loading && (
             <div className="dashboard-message">
               Loading appointments...
             </div>
           )}
-
 
           {/* EMPTY */}
           {!loading &&
@@ -413,7 +425,6 @@ function Appointments() {
 
               </div>
           )}
-
 
           {/* APPOINTMENTS */}
           {!loading &&
@@ -455,7 +466,6 @@ function Appointments() {
 
                         </div>
 
-
                         {/* STATUS */}
                         <span
                           className={`status-badge status-${appointment.status}`}
@@ -464,7 +474,6 @@ function Appointments() {
                         </span>
 
                       </div>
-
 
                       {/* DETAILS */}
                       <div className="appointment-details">
@@ -483,7 +492,6 @@ function Appointments() {
                           </strong>
 
                         </div>
-
 
                         {/* REASON */}
                         {appointment.reason && (
