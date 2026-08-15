@@ -10,7 +10,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Appointments from "./pages/Appointments";
 import Profile from "./pages/Profile";
 import MedicalRecords from "./pages/MedicalRecords";
-
+import CreateMedicalRecord from "./pages/CreateMedicalRecord";
 
 function Placeholder({ title }) {
   return <h1>{title}</h1>;
@@ -63,6 +63,11 @@ function App() {
           <Route
             path="/profile"
             element={<Profile />}
+          />
+                    
+          <Route
+           path="/create-medical-record"
+           element={<CreateMedicalRecord />}
           />
 
         </Route>
