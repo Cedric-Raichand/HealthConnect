@@ -8,10 +8,17 @@ function Dashboard() {
   const navigate = useNavigate();
 
   const [stats, setStats] = useState({
+    // Patient statistics
     appointments: 0,
     upcomingAppointments: 0,
     medicalRecords: 0,
     prescriptions: 0,
+
+    // Doctor statistics
+    totalAppointments: 0,
+    totalPatients: 0,
+    pendingAppointments: 0,
+    completedAppointments: 0,
   });
 
   const [loading, setLoading] = useState(true);
@@ -21,6 +28,7 @@ function Dashboard() {
     const fetchDashboard = async () => {
       try {
         setLoading(true);
+        setError("");
 
         const response = await api.get("/dashboard");
 
@@ -47,6 +55,10 @@ function Dashboard() {
 
   return (
     <div className="dashboard-page">
+      {/* ==========================================
+          HEADER
+      ========================================== */}
+
       <header className="dashboard-header">
         <Link to="/" className="dashboard-logo">
           Health<span>Connect</span>
@@ -54,8 +66,13 @@ function Dashboard() {
 
         <div className="dashboard-user">
           <div>
-            <strong>{user?.fullName || "User"}</strong>
-            <span>{user?.role || "patient"}</span>
+            <strong>
+              {user?.fullName || "User"}
+            </strong>
+
+            <span>
+              {user?.role || "patient"}
+            </span>
           </div>
 
           <button
@@ -67,9 +84,20 @@ function Dashboard() {
         </div>
       </header>
 
+      {/* ==========================================
+          MAIN CONTENT
+      ========================================== */}
+
       <main className="dashboard-content">
+
+        {/* ==========================================
+            WELCOME SECTION
+        ========================================== */}
+
         <section className="dashboard-welcome">
-          <p className="eyebrow">HEALTHCONNECT DASHBOARD</p>
+          <p className="eyebrow">
+            HEALTHCONNECT DASHBOARD
+          </p>
 
           <h1>
             Welcome, {user?.fullName || "User"} 👋
@@ -80,11 +108,19 @@ function Dashboard() {
           </p>
         </section>
 
+        {/* ==========================================
+            LOADING
+        ========================================== */}
+
         {loading && (
           <div className="dashboard-message">
             Loading your dashboard...
           </div>
         )}
+
+        {/* ==========================================
+            ERROR
+        ========================================== */}
 
         {error && (
           <div className="error-message">
@@ -92,107 +128,380 @@ function Dashboard() {
           </div>
         )}
 
-        {!loading && !error && (
-          <section className="dashboard-grid">
-            <Link
-              to="/appointments"
-              className="dashboard-card"
-            >
-              <span className="dashboard-card-number">
-                01
-              </span>
+        {/* ==========================================
+            PATIENT DASHBOARD
+        ========================================== */}
 
-              <h2>Appointments</h2>
+        {!loading &&
+          !error &&
+          user?.role === "patient" && (
+            <>
+              <section className="dashboard-grid">
 
-              <strong className="dashboard-stat">
-                {stats.appointments}
-              </strong>
+                {/* Appointments */}
 
-              <p>
-                Total appointments
-              </p>
-            </Link>
+                <Link
+                  to="/appointments"
+                  className="dashboard-card"
+                >
+                  <span className="dashboard-card-number">
+                    01
+                  </span>
 
-            <Link
-              to="/appointments"
-              className="dashboard-card"
-            >
-              <span className="dashboard-card-number">
-                02
-              </span>
+                  <h2>
+                    Appointments
+                  </h2>
 
-              <h2>Upcoming</h2>
+                  <strong className="dashboard-stat">
+                    {stats.appointments}
+                  </strong>
 
-              <strong className="dashboard-stat">
-                {stats.upcomingAppointments}
-              </strong>
+                  <p>
+                    Total appointments
+                  </p>
+                </Link>
 
-              <p>
-                Pending or confirmed appointments
-              </p>
-            </Link>
+                {/* Upcoming */}
 
-            <Link
-              to="/medical-records"
-              className="dashboard-card"
-            >
-              <span className="dashboard-card-number">
-                03
-              </span>
+                <Link
+                  to="/appointments"
+                  className="dashboard-card"
+                >
+                  <span className="dashboard-card-number">
+                    02
+                  </span>
 
-              <h2>Medical Records</h2>
+                  <h2>
+                    Upcoming
+                  </h2>
 
-              <strong className="dashboard-stat">
-                {stats.medicalRecords}
-              </strong>
+                  <strong className="dashboard-stat">
+                    {stats.upcomingAppointments}
+                  </strong>
 
-              <p>
-                Records available
-              </p>
-            </Link>
+                  <p>
+                    Pending or confirmed appointments
+                  </p>
+                </Link>
 
-            <Link
-              to="/prescriptions"
-              className="dashboard-card"
-            >
-              <span className="dashboard-card-number">
-                04
-              </span>
+                {/* Medical Records */}
 
-              <h2>Prescriptions</h2>
+                <Link
+                  to="/medical-records"
+                  className="dashboard-card"
+                >
+                  <span className="dashboard-card-number">
+                    03
+                  </span>
 
-              <strong className="dashboard-stat">
-                {stats.prescriptions}
-              </strong>
+                  <h2>
+                    Medical Records
+                  </h2>
 
-              <p>
-                Active prescriptions
-              </p>
-            </Link>
-          </section>
-        )}
+                  <strong className="dashboard-stat">
+                    {stats.medicalRecords}
+                  </strong>
 
-        <section className="dashboard-actions">
-          <h2>Quick Actions</h2>
+                  <p>
+                    Records available
+                  </p>
+                </Link>
 
-          <div className="quick-actions">
-            <Link to="/appointments">
-              Book Appointment
-            </Link>
+                {/* Prescriptions */}
 
-            <Link to="/medical-records">
-              View Medical Records
-            </Link>
+                <Link
+                  to="/prescriptions"
+                  className="dashboard-card"
+                >
+                  <span className="dashboard-card-number">
+                    04
+                  </span>
 
-            <Link to="/prescriptions">
-              View Prescriptions
-            </Link>
+                  <h2>
+                    Prescriptions
+                  </h2>
 
-            <Link to="/profile">
-              Update Profile
-            </Link>
-          </div>
-        </section>
+                  <strong className="dashboard-stat">
+                    {stats.prescriptions}
+                  </strong>
+
+                  <p>
+                    Active prescriptions
+                  </p>
+                </Link>
+
+              </section>
+
+              {/* Patient Quick Actions */}
+
+              <section className="dashboard-actions">
+                <h2>
+                  Quick Actions
+                </h2>
+
+                <div className="quick-actions">
+
+                  <Link to="/appointments">
+                    Book Appointment
+                  </Link>
+
+                  <Link to="/medical-records">
+                    View Medical Records
+                  </Link>
+
+                  <Link to="/prescriptions">
+                    View Prescriptions
+                  </Link>
+
+                  <Link to="/profile">
+                    Update Profile
+                  </Link>
+
+                </div>
+              </section>
+            </>
+          )}
+
+        {/* ==========================================
+            DOCTOR DASHBOARD
+        ========================================== */}
+
+        {!loading &&
+          !error &&
+          user?.role === "doctor" && (
+            <>
+              <section className="dashboard-grid">
+
+                {/* Total Appointments */}
+
+                <Link
+                  to="/appointments"
+                  className="dashboard-card"
+                >
+                  <span className="dashboard-card-number">
+                    01
+                  </span>
+
+                  <h2>
+                    Total Appointments
+                  </h2>
+
+                  <strong className="dashboard-stat">
+                    {stats.totalAppointments}
+                  </strong>
+
+                  <p>
+                    Appointments assigned to you
+                  </p>
+                </Link>
+
+                {/* Total Patients */}
+
+                <Link
+                  to="/appointments"
+                  className="dashboard-card"
+                >
+                  <span className="dashboard-card-number">
+                    02
+                  </span>
+
+                  <h2>
+                    Total Patients
+                  </h2>
+
+                  <strong className="dashboard-stat">
+                    {stats.totalPatients}
+                  </strong>
+
+                  <p>
+                    Patients you have appointments with
+                  </p>
+                </Link>
+
+                {/* Pending Appointments */}
+
+                <Link
+                  to="/appointments"
+                  className="dashboard-card"
+                >
+                  <span className="dashboard-card-number">
+                    03
+                  </span>
+
+                  <h2>
+                    Pending
+                  </h2>
+
+                  <strong className="dashboard-stat">
+                    {stats.pendingAppointments}
+                  </strong>
+
+                  <p>
+                    Appointments awaiting action
+                  </p>
+                </Link>
+
+                {/* Completed Appointments */}
+
+                <Link
+                  to="/appointments"
+                  className="dashboard-card"
+                >
+                  <span className="dashboard-card-number">
+                    04
+                  </span>
+
+                  <h2>
+                    Completed
+                  </h2>
+
+                  <strong className="dashboard-stat">
+                    {stats.completedAppointments}
+                  </strong>
+
+                  <p>
+                    Completed appointments
+                  </p>
+                </Link>
+
+              </section>
+
+              {/* Doctor Quick Actions */}
+
+              <section className="dashboard-actions">
+                <h2>
+                  Quick Actions
+                </h2>
+
+                <div className="quick-actions">
+
+                  <Link to="/appointments">
+                    View Appointments
+                  </Link>
+
+                  <Link to="/medical-records">
+                    Medical Records
+                  </Link>
+
+                  <Link to="/profile">
+                    Update Profile
+                  </Link>
+
+                </div>
+              </section>
+            </>
+          )}
+
+        {/* ==========================================
+            ADMIN DASHBOARD
+        ========================================== */}
+
+        {!loading &&
+          !error &&
+          user?.role === "admin" && (
+            <>
+              <section className="dashboard-grid">
+
+                <div className="dashboard-card">
+                  <span className="dashboard-card-number">
+                    01
+                  </span>
+
+                  <h2>
+                    Users
+                  </h2>
+
+                  <strong className="dashboard-stat">
+                    {stats.users || 0}
+                  </strong>
+
+                  <p>
+                    Total registered users
+                  </p>
+                </div>
+
+                <div className="dashboard-card">
+                  <span className="dashboard-card-number">
+                    02
+                  </span>
+
+                  <h2>
+                    Doctors
+                  </h2>
+
+                  <strong className="dashboard-stat">
+                    {stats.doctors || 0}
+                  </strong>
+
+                  <p>
+                    Registered doctors
+                  </p>
+                </div>
+
+                <div className="dashboard-card">
+                  <span className="dashboard-card-number">
+                    03
+                  </span>
+
+                  <h2>
+                    Patients
+                  </h2>
+
+                  <strong className="dashboard-stat">
+                    {stats.patients || 0}
+                  </strong>
+
+                  <p>
+                    Registered patients
+                  </p>
+                </div>
+
+                <div className="dashboard-card">
+                  <span className="dashboard-card-number">
+                    04
+                  </span>
+
+                  <h2>
+                    Appointments
+                  </h2>
+
+                  <strong className="dashboard-stat">
+                    {stats.appointments || 0}
+                  </strong>
+
+                  <p>
+                    Total appointments
+                  </p>
+                </div>
+
+              </section>
+
+              {/* Admin Quick Actions */}
+
+              <section className="dashboard-actions">
+                <h2>
+                  Quick Actions
+                </h2>
+
+                <div className="quick-actions">
+
+                  <Link to="/appointments">
+                    View Appointments
+                  </Link>
+
+                  <Link to="/medical-records">
+                    Medical Records
+                  </Link>
+
+                  <Link to="/profile">
+                    Update Profile
+                  </Link>
+
+                </div>
+              </section>
+            </>
+          )}
+
       </main>
     </div>
   );
