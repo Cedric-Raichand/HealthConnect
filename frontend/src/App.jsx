@@ -11,6 +11,7 @@ import Appointments from "./pages/Appointments";
 import Profile from "./pages/Profile";
 import MedicalRecords from "./pages/MedicalRecords";
 
+
 function Placeholder({ title }) {
   return <h1>{title}</h1>;
 }
