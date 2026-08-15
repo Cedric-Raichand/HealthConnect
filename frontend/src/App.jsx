@@ -11,6 +11,7 @@ import Appointments from "./pages/Appointments";
 import Profile from "./pages/Profile";
 import MedicalRecords from "./pages/MedicalRecords";
 import CreateMedicalRecord from "./pages/CreateMedicalRecord";
+import Prescriptions from "./pages/Prescriptions";
 
 function Placeholder({ title }) {
   return <h1>{title}</h1>;
@@ -55,9 +56,7 @@ function App() {
 
           <Route
             path="/prescriptions"
-            element={
-              <Placeholder title="Prescriptions" />
-            }
+            element={<Prescriptions />}
           />
 
           <Route
