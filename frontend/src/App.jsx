@@ -13,6 +13,7 @@ import MedicalRecords from "./pages/MedicalRecords";
 import CreateMedicalRecord from "./pages/CreateMedicalRecord";
 import Prescriptions from "./pages/Prescriptions";
 import DoctorPrescriptions from "./pages/DoctorPrescriptions";
+import DoctorMedicalRecords from "./pages/DoctorMedicalRecords";
 
 function Placeholder({ title }) {
   return <h1>{title}</h1>;
@@ -75,6 +76,10 @@ function App() {
            element={<DoctorPrescriptions />}
           />
 
+          <Route
+           path="/doctor/medical-records"
+           element={<DoctorMedicalRecords />}
+          />
         </Route>
 
 
