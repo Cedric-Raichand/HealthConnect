@@ -132,6 +132,27 @@ const getDoctors = async (req, res, next) => {
 };
 
 // ==========================================
+// GET ALL USERS
+// Admin only
+// ==========================================
+
+const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await User.find()
+      .select("-password")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      count: users.length,
+      users,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+// ==========================================
 // EXPORT CONTROLLERS
 // ==========================================
 
@@ -139,4 +160,5 @@ module.exports = {
   getProfile,
   updateProfile,
   getDoctors,
+  getAllUsers,
 };
