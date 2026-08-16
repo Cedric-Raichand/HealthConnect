@@ -14,6 +14,7 @@ import CreateMedicalRecord from "./pages/CreateMedicalRecord";
 import Prescriptions from "./pages/Prescriptions";
 import DoctorPrescriptions from "./pages/DoctorPrescriptions";
 import DoctorMedicalRecords from "./pages/DoctorMedicalRecords";
+import DoctorAppointments from "./pages/DoctorAppointments";
 
 function Placeholder({ title }) {
   return <h1>{title}</h1>;
@@ -80,7 +81,18 @@ function App() {
            path="/doctor/medical-records"
            element={<DoctorMedicalRecords />}
           />
+
+          <Route
+           path="/doctor/appointments"
+           element={<DoctorAppointments />}
+          />
+
+
+
+
         </Route>
+          
+
 
 
         {/* ============================= */}
