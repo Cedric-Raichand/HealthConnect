@@ -169,7 +169,7 @@ function AdminDashboard() {
 
             {/* PATIENTS */}
             <Link
-              to="/profile"
+              to="/admin/users"
               className="dashboard-card"
             >
               <span className="dashboard-card-number">
