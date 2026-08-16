@@ -10,6 +10,9 @@ const {
   updateProfile,
   getDoctors,
   getAllUsers,
+  getUserById,
+  updateUserVerification,
+  deleteUser,
 } = require("../controllers/userController");
 
 
@@ -56,6 +59,45 @@ router.get(
   protect,
   authorizeRoles("admin"),
   getAllUsers
+);
+
+
+// ==========================================
+// GET SINGLE USER
+// Admin only
+// ==========================================
+
+router.get(
+  "/:id",
+  protect,
+  authorizeRoles("admin"),
+  getUserById
+);
+
+
+// ==========================================
+// VERIFY / UNVERIFY USER
+// Admin only
+// ==========================================
+
+router.patch(
+  "/:id/verification",
+  protect,
+  authorizeRoles("admin"),
+  updateUserVerification
+);
+
+
+// ==========================================
+// DELETE USER
+// Admin only
+// ==========================================
+
+router.delete(
+  "/:id",
+  protect,
+  authorizeRoles("admin"),
+  deleteUser
 );
 
 

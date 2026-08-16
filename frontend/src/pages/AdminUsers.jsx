@@ -7,9 +7,17 @@ function AdminUsers() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  // ==========================================
+  // GET ALL USERS
+  // ==========================================
 
   const fetchUsers = async () => {
     try {
@@ -31,12 +39,140 @@ function AdminUsers() {
     }
   };
 
+  // ==========================================
+  // GET SINGLE USER
+  // ==========================================
+
+  const handleViewUser = async (userId) => {
+    try {
+      setDetailsLoading(true);
+      setError("");
+
+      const response = await api.get(`/users/${userId}`);
+
+      setSelectedUser(response.data);
+    } catch (error) {
+      console.error("User details error:", error);
+
+      setError(
+        error.response?.data?.message ||
+          "Unable to load user details."
+      );
+    } finally {
+      setDetailsLoading(false);
+    }
+  };
+
+  // ==========================================
+  // VERIFY / UNVERIFY USER
+  // ==========================================
+
+  const handleVerification = async (user) => {
+    try {
+      setActionLoading(true);
+      setError("");
+
+      const response = await api.patch(
+        `/users/${user._id}/verification`,
+        {
+          isVerified: !user.isVerified,
+        }
+      );
+
+      const updatedUser = response.data.user;
+
+      setUsers((currentUsers) =>
+        currentUsers.map((currentUser) =>
+          currentUser._id === user._id
+            ? {
+                ...currentUser,
+                isVerified: updatedUser.isVerified,
+              }
+            : currentUser
+        )
+      );
+
+      if (
+        selectedUser &&
+        selectedUser._id === user._id
+      ) {
+        setSelectedUser((currentUser) => ({
+          ...currentUser,
+          isVerified: updatedUser.isVerified,
+        }));
+      }
+    } catch (error) {
+      console.error(
+        "Verification error:",
+        error
+      );
+
+      setError(
+        error.response?.data?.message ||
+          "Unable to update verification status."
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // ==========================================
+  // DELETE USER
+  // ==========================================
+
+  const handleDeleteUser = async (user) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${user.fullName}?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      setError("");
+
+      await api.delete(`/users/${user._id}`);
+
+      setUsers((currentUsers) =>
+        currentUsers.filter(
+          (currentUser) =>
+            currentUser._id !== user._id
+        )
+      );
+
+      if (
+        selectedUser &&
+        selectedUser._id === user._id
+      ) {
+        setSelectedUser(null);
+      }
+    } catch (error) {
+      console.error("Delete user error:", error);
+
+      setError(
+        error.response?.data?.message ||
+          "Unable to delete user."
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // ==========================================
+  // FORMAT DATE
+  // ==========================================
+
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString("en-GH", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
+    return new Date(date).toLocaleDateString(
+      "en-GH",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }
+    );
   };
 
   return (
@@ -75,23 +211,23 @@ function AdminUsers() {
           </h1>
 
           <p>
-            View all registered patients, doctors
-            and administrators on HealthConnect.
+            View and manage registered patients,
+            doctors and administrators.
           </p>
 
         </section>
+
+        {/* ERROR */}
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
 
         {/* LOADING */}
         {loading && (
           <div className="dashboard-message">
             Loading users...
-          </div>
-        )}
-
-        {/* ERROR */}
-        {!loading && error && (
-          <div className="error-message">
-            {error}
           </div>
         )}
 
@@ -106,7 +242,8 @@ function AdminUsers() {
               </h2>
 
               <p>
-                There are currently no registered users.
+                There are currently no registered
+                users.
               </p>
 
             </div>
@@ -114,7 +251,6 @@ function AdminUsers() {
 
         {/* USERS */}
         {!loading &&
-          !error &&
           users.length > 0 && (
             <section className="appointments-section">
 
@@ -149,7 +285,13 @@ function AdminUsers() {
 
                       </div>
 
-                      <span className="status-badge status-confirmed">
+                      <span
+                        className={`status-badge ${
+                          user.isVerified
+                            ? "status-confirmed"
+                            : "status-pending"
+                        }`}
+                      >
                         {user.isVerified
                           ? "Verified"
                           : "Not Verified"}
@@ -172,7 +314,8 @@ function AdminUsers() {
                         <span>Phone</span>
 
                         <strong>
-                          {user.phone || "Not provided"}
+                          {user.phone ||
+                            "Not provided"}
                         </strong>
                       </div>
 
@@ -180,7 +323,9 @@ function AdminUsers() {
                         <span>Joined</span>
 
                         <strong>
-                          {formatDate(user.createdAt)}
+                          {formatDate(
+                            user.createdAt
+                          )}
                         </strong>
                       </div>
 
@@ -191,7 +336,9 @@ function AdminUsers() {
                       <div className="appointment-details">
 
                         <div>
-                          <span>Specialization</span>
+                          <span>
+                            Specialization
+                          </span>
 
                           <strong>
                             {user.specialization ||
@@ -200,7 +347,9 @@ function AdminUsers() {
                         </div>
 
                         <div>
-                          <span>Hospital</span>
+                          <span>
+                            Hospital
+                          </span>
 
                           <strong>
                             {user.hospital ||
@@ -209,15 +358,56 @@ function AdminUsers() {
                         </div>
 
                         <div>
-                          <span>Experience</span>
+                          <span>
+                            Experience
+                          </span>
 
                           <strong>
-                            {user.yearsOfExperience || 0} years
+                            {user.yearsOfExperience ||
+                              0}{" "}
+                            years
                           </strong>
                         </div>
 
                       </div>
                     )}
+
+                    {/* ACTIONS */}
+                    <div className="quick-actions">
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleViewUser(user._id)
+                        }
+                        disabled={detailsLoading}
+                      >
+                        View Details
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleVerification(user)
+                        }
+                        disabled={actionLoading}
+                      >
+                        {user.isVerified
+                          ? "Unverify User"
+                          : "Verify User"}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleDeleteUser(user)
+                        }
+                        disabled={actionLoading}
+                      >
+                        Delete User
+                      </button>
+
+                    </div>
 
                   </article>
                 ))}
@@ -227,7 +417,85 @@ function AdminUsers() {
             </section>
           )}
 
+        {/* USER DETAILS */}
+        {selectedUser && (
+          <section className="appointments-section">
+
+            <h2>
+              User Details
+            </h2>
+
+            <div className="appointment-card">
+
+              <h2>
+                {selectedUser.fullName}
+              </h2>
+
+              <div className="appointment-details">
+
+                <div>
+                  <span>Email</span>
+
+                  <strong>
+                    {selectedUser.email}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Role</span>
+
+                  <strong>
+                    {selectedUser.role}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Phone</span>
+
+                  <strong>
+                    {selectedUser.phone ||
+                      "Not provided"}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Verification</span>
+
+                  <strong>
+                    {selectedUser.isVerified
+                      ? "Verified"
+                      : "Not Verified"}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Joined</span>
+
+                  <strong>
+                    {formatDate(
+                      selectedUser.createdAt
+                    )}
+                  </strong>
+                </div>
+
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setSelectedUser(null)
+                }
+              >
+                Close Details
+              </button>
+
+            </div>
+
+          </section>
+        )}
+
       </main>
+
     </div>
   );
 }

@@ -151,6 +151,110 @@ const getAllUsers = async (req, res, next) => {
   }
 };
 
+// ==========================================
+// GET SINGLE USER
+// Admin only
+// ==========================================
+
+const getUserById = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ==========================================
+// VERIFY / UNVERIFY USER
+// Admin only
+// ==========================================
+
+const updateUserVerification = async (req, res, next) => {
+  try {
+    const { isVerified } = req.body;
+
+    if (typeof isVerified !== "boolean") {
+      return res.status(400).json({
+        message: "isVerified must be true or false",
+      });
+    }
+
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // Prevent admin from changing their own verification
+    if (user._id.toString() === req.user._id.toString()) {
+      return res.status(400).json({
+        message: "You cannot change your own verification status",
+      });
+    }
+
+    user.isVerified = isVerified;
+
+    await user.save();
+
+    res.status(200).json({
+      message: isVerified
+        ? "User verified successfully"
+        : "User unverified successfully",
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        isVerified: user.isVerified,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ==========================================
+// DELETE USER
+// Admin only
+// ==========================================
+
+const deleteUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // Prevent admin from deleting themselves
+    if (user._id.toString() === req.user._id.toString()) {
+      return res.status(400).json({
+        message: "You cannot delete your own account",
+      });
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 // ==========================================
 // EXPORT CONTROLLERS
@@ -161,4 +265,7 @@ module.exports = {
   updateProfile,
   getDoctors,
   getAllUsers,
+  getUserById,
+  updateUserVerification,
+  deleteUser,
 };
