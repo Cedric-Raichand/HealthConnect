@@ -420,7 +420,7 @@ function DoctorPrescriptions() {
               prescription.
             </p>
 
-            <Link to="/medical-records">
+            <Link to="/doctor/medical-records">
               View Medical Records
             </Link>
 
