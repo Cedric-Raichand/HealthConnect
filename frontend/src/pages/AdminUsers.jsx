@@ -1,14 +1,14 @@
+
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 function AdminUsers() {
+  const navigate = useNavigate();
+
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [detailsLoading, setDetailsLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
@@ -40,27 +40,11 @@ function AdminUsers() {
   };
 
   // ==========================================
-  // GET SINGLE USER
+  // VIEW SINGLE USER
   // ==========================================
 
-  const handleViewUser = async (userId) => {
-    try {
-      setDetailsLoading(true);
-      setError("");
-
-      const response = await api.get(`/users/${userId}`);
-
-      setSelectedUser(response.data);
-    } catch (error) {
-      console.error("User details error:", error);
-
-      setError(
-        error.response?.data?.message ||
-          "Unable to load user details."
-      );
-    } finally {
-      setDetailsLoading(false);
-    }
+  const handleViewUser = (userId) => {
+    navigate(`/admin/users/${userId}`);
   };
 
   // ==========================================
@@ -91,21 +75,8 @@ function AdminUsers() {
             : currentUser
         )
       );
-
-      if (
-        selectedUser &&
-        selectedUser._id === user._id
-      ) {
-        setSelectedUser((currentUser) => ({
-          ...currentUser,
-          isVerified: updatedUser.isVerified,
-        }));
-      }
     } catch (error) {
-      console.error(
-        "Verification error:",
-        error
-      );
+      console.error("Verification error:", error);
 
       setError(
         error.response?.data?.message ||
@@ -141,13 +112,6 @@ function AdminUsers() {
             currentUser._id !== user._id
         )
       );
-
-      if (
-        selectedUser &&
-        selectedUser._id === user._id
-      ) {
-        setSelectedUser(null);
-      }
     } catch (error) {
       console.error("Delete user error:", error);
 
@@ -380,7 +344,6 @@ function AdminUsers() {
                         onClick={() =>
                           handleViewUser(user._id)
                         }
-                        disabled={detailsLoading}
                       >
                         View Details
                       </button>
@@ -417,83 +380,6 @@ function AdminUsers() {
             </section>
           )}
 
-        {/* USER DETAILS */}
-        {selectedUser && (
-          <section className="appointments-section">
-
-            <h2>
-              User Details
-            </h2>
-
-            <div className="appointment-card">
-
-              <h2>
-                {selectedUser.fullName}
-              </h2>
-
-              <div className="appointment-details">
-
-                <div>
-                  <span>Email</span>
-
-                  <strong>
-                    {selectedUser.email}
-                  </strong>
-                </div>
-
-                <div>
-                  <span>Role</span>
-
-                  <strong>
-                    {selectedUser.role}
-                  </strong>
-                </div>
-
-                <div>
-                  <span>Phone</span>
-
-                  <strong>
-                    {selectedUser.phone ||
-                      "Not provided"}
-                  </strong>
-                </div>
-
-                <div>
-                  <span>Verification</span>
-
-                  <strong>
-                    {selectedUser.isVerified
-                      ? "Verified"
-                      : "Not Verified"}
-                  </strong>
-                </div>
-
-                <div>
-                  <span>Joined</span>
-
-                  <strong>
-                    {formatDate(
-                      selectedUser.createdAt
-                    )}
-                  </strong>
-                </div>
-
-              </div>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setSelectedUser(null)
-                }
-              >
-                Close Details
-              </button>
-
-            </div>
-
-          </section>
-        )}
-
       </main>
 
     </div>
@@ -501,3 +387,4 @@ function AdminUsers() {
 }
 
 export default AdminUsers;
+

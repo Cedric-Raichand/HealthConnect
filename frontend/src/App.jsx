@@ -17,6 +17,8 @@ import DoctorMedicalRecords from "./pages/DoctorMedicalRecords";
 import DoctorAppointments from "./pages/DoctorAppointments";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
+import AdminUserDetails from "./pages/AdminUserDetails";
+
 
 function Placeholder({ title }) {
   return <h1>{title}</h1>;
@@ -97,6 +99,16 @@ function App() {
           <Route
            path="/admin/users"
            element={<AdminUsers />}
+          />
+
+          <Route
+           path="/admin/users"
+           element={<AdminUsers />}
+          />
+
+          <Route
+           path="/admin/users/:id"
+           element={<AdminUserDetails />}
           />
 
 
