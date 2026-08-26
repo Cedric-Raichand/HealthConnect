@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -74,20 +75,26 @@ function MedicalRecords() {
         <section className="dashboard-welcome">
 
           <p className="eyebrow">
-            {isAdmin ? "ADMIN PORTAL" : "HEALTHCARE"}
+            {isAdmin
+              ? "ADMIN PORTAL"
+              : isDoctor
+              ? "HEALTHCARE"
+              : "HEALTHCARE"}
           </p>
 
           <h1>
             {isAdmin
               ? "Manage Medical Records"
+              : isDoctor
+              ? "Patient Medical Records"
               : "Medical Records"}
           </h1>
 
           <p>
             {isAdmin
-              ? "View medical records created for patients across HealthConnect."
+              ? "View and monitor all medical records across HealthConnect."
               : isDoctor
-              ? "View medical records you have created for your patients."
+              ? "View medical records created for your patients."
               : "View your medical history, diagnoses, treatments and other healthcare information."}
           </p>
 
@@ -119,7 +126,9 @@ function MedicalRecords() {
 
               <p>
                 {isAdmin
-                  ? "There are currently no medical records in the system."
+                  ? "There are currently no medical records in HealthConnect."
+                  : isDoctor
+                  ? "Medical records you create for patients will appear here."
                   : "Your medical records will appear here after a doctor creates one for you."}
               </p>
 
@@ -135,7 +144,9 @@ function MedicalRecords() {
               <h2>
                 {isAdmin
                   ? `All Medical Records (${records.length})`
-                  : `Medical Records (${records.length})`}
+                  : isDoctor
+                  ? "Your Medical Records"
+                  : "Your Medical Records"}
               </h2>
 
               {records.map((record) => (
@@ -166,85 +177,46 @@ function MedicalRecords() {
 
                   </div>
 
-                  {/* ADMIN: PATIENT */}
-                  {isAdmin && record.patient && (
-                    <div className="record-section">
+                  {/* ADMIN / DOCTOR / PATIENT INFORMATION */}
+                  <div className="record-section">
 
-                      <span>Patient</span>
+                    <span>Patient</span>
 
-                      <strong>
-                        {record.patient.fullName ||
-                          "Patient"}
-                      </strong>
+                    <strong>
+                      {record.patient?.fullName ||
+                        "Not available"}
+                    </strong>
 
-                      {record.patient.email && (
-                        <p>
-                          {record.patient.email}
-                        </p>
-                      )}
+                    {record.patient?.email && (
+                      <p>
+                        {record.patient.email}
+                      </p>
+                    )}
 
-                    </div>
-                  )}
+                    {record.patient?.phone && (
+                      <p>
+                        {record.patient.phone}
+                      </p>
+                    )}
 
-                  {/* ADMIN: DOCTOR */}
-                  {isAdmin && record.doctor && (
-                    <div className="record-section">
+                  </div>
 
-                      <span>Doctor</span>
+                  <div className="record-section">
 
-                      <strong>
-                        {record.doctor.fullName ||
-                          "Doctor"}
-                      </strong>
+                    <span>Doctor</span>
 
-                      {record.doctor.email && (
-                        <p>
-                          {record.doctor.email}
-                        </p>
-                      )}
+                    <strong>
+                      {record.doctor?.fullName ||
+                        "Not available"}
+                    </strong>
 
-                    </div>
-                  )}
+                    {record.doctor?.email && (
+                      <p>
+                        {record.doctor.email}
+                      </p>
+                    )}
 
-                  {/* DOCTOR */}
-                  {!isAdmin && record.doctor && (
-                    <div className="record-section">
-
-                      <span>Doctor</span>
-
-                      <strong>
-                        {record.doctor.fullName ||
-                          "Doctor"}
-                      </strong>
-
-                      {record.doctor.email && (
-                        <p>
-                          {record.doctor.email}
-                        </p>
-                      )}
-
-                    </div>
-                  )}
-
-                  {/* PATIENT */}
-                  {isDoctor && record.patient && (
-                    <div className="record-section">
-
-                      <span>Patient</span>
-
-                      <strong>
-                        {record.patient.fullName ||
-                          "Patient"}
-                      </strong>
-
-                      {record.patient.email && (
-                        <p>
-                          {record.patient.email}
-                        </p>
-                      )}
-
-                    </div>
-                  )}
+                  </div>
 
                   {/* SYMPTOMS */}
                   <div className="record-section">
@@ -311,12 +283,12 @@ function MedicalRecords() {
                     )}
 
                   {/* VIEW DETAILS */}
-                  <div className="dashboard-actions">
+                  <div className="quick-actions">
 
                     <Link
                       to={`/medical-records/${record._id}`}
                     >
-                      View Details
+                      View Full Record
                     </Link>
 
                   </div>
@@ -328,6 +300,7 @@ function MedicalRecords() {
           )}
 
       </main>
+
     </div>
   );
 }
