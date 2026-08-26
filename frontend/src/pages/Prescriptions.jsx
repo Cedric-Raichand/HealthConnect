@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 
 function Prescriptions() {
+  const { user } = useAuth();
+
   const [prescriptions, setPrescriptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -41,36 +44,52 @@ function Prescriptions() {
     });
   };
 
+  const isAdmin = user?.role === "admin";
+
   return (
     <div className="dashboard-page">
+
       {/* HEADER */}
       <header className="dashboard-header">
+
         <Link
-          to="/dashboard"
+          to={isAdmin ? "/admin/dashboard" : "/dashboard"}
           className="dashboard-logo"
         >
           Health<span>Connect</span>
         </Link>
 
         <Link
-          to="/dashboard"
+          to={isAdmin ? "/admin/dashboard" : "/dashboard"}
           className="back-button"
         >
-          ← Dashboard
+          ← {isAdmin ? "Admin Dashboard" : "Dashboard"}
         </Link>
+
       </header>
 
       {/* CONTENT */}
       <main className="dashboard-content">
 
+        {/* PAGE INTRO */}
         <section className="dashboard-welcome">
-          <p className="eyebrow">HEALTHCARE</p>
 
-          <h1>My Prescriptions</h1>
+          <p className="eyebrow">
+            {isAdmin ? "ADMIN PORTAL" : "HEALTHCARE"}
+          </p>
+
+          <h1>
+            {isAdmin
+              ? "All Prescriptions"
+              : "My Prescriptions"}
+          </h1>
 
           <p>
-            View medicines prescribed by your doctors.
+            {isAdmin
+              ? "View prescriptions issued to patients across HealthConnect."
+              : "View medicines prescribed by your doctors."}
           </p>
+
         </section>
 
         {/* LOADING */}
@@ -81,7 +100,7 @@ function Prescriptions() {
         )}
 
         {/* ERROR */}
-        {error && (
+        {!loading && error && (
           <div className="error-message">
             {error}
           </div>
@@ -92,12 +111,19 @@ function Prescriptions() {
           !error &&
           prescriptions.length === 0 && (
             <div className="empty-state">
-              <h2>No prescriptions yet</h2>
+
+              <h2>
+                {isAdmin
+                  ? "No prescriptions found"
+                  : "No prescriptions yet"}
+              </h2>
 
               <p>
-                Your prescriptions will appear here
-                when a doctor prescribes medication for you.
+                {isAdmin
+                  ? "There are currently no prescriptions in the system."
+                  : "Your prescriptions will appear here when a doctor prescribes medication for you."}
               </p>
+
             </div>
           )}
 
@@ -108,12 +134,15 @@ function Prescriptions() {
             <section className="appointments-section">
 
               <h2>
-                Your Prescriptions
+                {isAdmin
+                  ? `All Prescriptions (${prescriptions.length})`
+                  : "Your Prescriptions"}
               </h2>
 
               <div className="appointments-list">
 
                 {prescriptions.map((prescription) => (
+
                   <div
                     className="appointment-card"
                     key={prescription._id}
@@ -123,6 +152,7 @@ function Prescriptions() {
                     <div className="appointment-main">
 
                       <div>
+
                         <span className="appointment-label">
                           Prescription
                         </span>
@@ -131,6 +161,18 @@ function Prescriptions() {
                           {prescription.medicine}
                         </h2>
 
+                        {/* PATIENT - ADMIN ONLY */}
+                        {isAdmin &&
+                          prescription.patient && (
+                            <p>
+                              Patient:{" "}
+                              <strong>
+                                {prescription.patient.fullName}
+                              </strong>
+                            </p>
+                          )}
+
+                        {/* DOCTOR */}
                         {prescription.doctor && (
                           <p>
                             Prescribed by{" "}
@@ -139,6 +181,7 @@ function Prescriptions() {
                             </strong>
                           </p>
                         )}
+
                       </div>
 
                       <span className="status-badge status-confirmed">
@@ -186,6 +229,58 @@ function Prescriptions() {
 
                     </div>
 
+                    {/* ADMIN PATIENT DETAILS */}
+                    {isAdmin &&
+                      prescription.patient && (
+                        <div className="appointment-details">
+
+                          <div>
+                            <span>Patient Email</span>
+
+                            <strong>
+                              {prescription.patient.email ||
+                                "Not provided"}
+                            </strong>
+                          </div>
+
+                          <div>
+                            <span>Patient Phone</span>
+
+                            <strong>
+                              {prescription.patient.phone ||
+                                "Not provided"}
+                            </strong>
+                          </div>
+
+                        </div>
+                      )}
+
+                    {/* DOCTOR DETAILS */}
+                    {isAdmin &&
+                      prescription.doctor && (
+                        <div className="appointment-details">
+
+                          <div>
+                            <span>Doctor Email</span>
+
+                            <strong>
+                              {prescription.doctor.email ||
+                                "Not provided"}
+                            </strong>
+                          </div>
+
+                          <div>
+                            <span>Doctor Phone</span>
+
+                            <strong>
+                              {prescription.doctor.phone ||
+                                "Not provided"}
+                            </strong>
+                          </div>
+
+                        </div>
+                      )}
+
                     {/* INSTRUCTIONS */}
                     {prescription.instructions && (
                       <div className="appointment-details">
@@ -202,6 +297,7 @@ function Prescriptions() {
                     )}
 
                   </div>
+
                 ))}
 
               </div>
@@ -210,6 +306,7 @@ function Prescriptions() {
           )}
 
       </main>
+
     </div>
   );
 }
