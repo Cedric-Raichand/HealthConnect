@@ -5,7 +5,6 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
-
 import ProtectedRoute from "./components/ProtectedRoute";
 import Appointments from "./pages/Appointments";
 import Profile from "./pages/Profile";
@@ -20,11 +19,6 @@ import AdminUsers from "./pages/AdminUsers";
 import AdminUserDetails from "./pages/AdminUserDetails";
 import MedicalRecordDetails from "./pages/MedicalRecordDetails";
 
-
-function Placeholder({ title }) {
-  return <h1>{title}</h1>;
-}
-
 function App() {
   return (
     <BrowserRouter>
@@ -34,15 +28,24 @@ function App() {
         {/* PUBLIC ROUTES */}
         {/* ============================= */}
 
-        <Route path="/" element={<Home />} />
+        <Route
+          path="/"
+          element={<Home />}
+        />
 
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={<Login />}
+        />
 
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/register"
+          element={<Register />}
+        />
 
 
         {/* ============================= */}
-        {/* PROTECTED ROUTES */}
+        {/* GENERAL PROTECTED ROUTES */}
         {/* ============================= */}
 
         <Route element={<ProtectedRoute />}>
@@ -58,8 +61,8 @@ function App() {
           />
 
           <Route
-           path="/medical-records"
-           element={<MedicalRecords />}
+            path="/medical-records"
+            element={<MedicalRecords />}
           />
 
           <Route
@@ -71,31 +74,61 @@ function App() {
             path="/profile"
             element={<Profile />}
           />
-                    
+
           <Route
-           path="/create-medical-record"
-           element={<CreateMedicalRecord />}
+            path="/medical-records/:id"
+            element={<MedicalRecordDetails />}
+          />
+
+        </Route>
+
+
+        {/* ============================= */}
+        {/* DOCTOR ROUTES */}
+        {/* ============================= */}
+
+        <Route
+          element={
+            <ProtectedRoute
+              allowedRoles={["doctor"]}
+            />
+          }
+        >
+
+          <Route
+            path="/doctor/appointments"
+            element={<DoctorAppointments />}
           />
 
           <Route
-           path="/doctor/prescriptions"
-           element={<DoctorPrescriptions />}
+            path="/doctor/medical-records"
+            element={<DoctorMedicalRecords />}
           />
 
           <Route
-           path="/doctor/medical-records"
-           element={<DoctorMedicalRecords />}
+            path="/doctor/prescriptions"
+            element={<DoctorPrescriptions />}
           />
 
           <Route
-           path="/medical-records/:id"
-           element={<MedicalRecordDetails />}
+            path="/create-medical-record"
+            element={<CreateMedicalRecord />}
           />
 
-          <Route
-           path="/doctor/appointments"
-           element={<DoctorAppointments />}
-          />
+        </Route>
+
+
+        {/* ============================= */}
+        {/* ADMIN ROUTES */}
+        {/* ============================= */}
+
+        <Route
+          element={
+            <ProtectedRoute
+              allowedRoles={["admin"]}
+            />
+          }
+        >
 
           <Route
             path="/admin/dashboard"
@@ -103,26 +136,16 @@ function App() {
           />
 
           <Route
-           path="/admin/users"
-           element={<AdminUsers />}
+            path="/admin/users"
+            element={<AdminUsers />}
           />
 
           <Route
-           path="/admin/users"
-           element={<AdminUsers />}
+            path="/admin/users/:id"
+            element={<AdminUserDetails />}
           />
-
-          <Route
-           path="/admin/users/:id"
-           element={<AdminUserDetails />}
-          />
-
-
-
 
         </Route>
-          
-
 
 
         {/* ============================= */}
