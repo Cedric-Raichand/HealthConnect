@@ -259,7 +259,7 @@ function AdminDashboard() {
 
           <div className="quick-actions">
 
-            <Link to="/appointments">
+            <Link to="/admin/appointments">
               View Appointments
             </Link>
 

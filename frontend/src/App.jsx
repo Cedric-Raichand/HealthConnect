@@ -18,6 +18,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminUserDetails from "./pages/AdminUserDetails";
 import MedicalRecordDetails from "./pages/MedicalRecordDetails";
+import AdminAppointments from "./pages/AdminAppointments";
 
 function App() {
   return (
@@ -114,7 +115,8 @@ function App() {
             path="/create-medical-record"
             element={<CreateMedicalRecord />}
           />
-
+         
+         
         </Route>
 
 
@@ -144,6 +146,11 @@ function App() {
             path="/admin/users/:id"
             element={<AdminUserDetails />}
           />
+
+          <Route
+           path="/admin/appointments"
+           element={<AdminAppointments />}
+         />
 
         </Route>
 
