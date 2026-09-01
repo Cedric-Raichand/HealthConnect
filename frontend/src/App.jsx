@@ -5,7 +5,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+
 import ProtectedRoute from "./components/ProtectedRoute";
+
 import Appointments from "./pages/Appointments";
 import Profile from "./pages/Profile";
 import MedicalRecords from "./pages/MedicalRecords";
@@ -14,11 +16,13 @@ import Prescriptions from "./pages/Prescriptions";
 import DoctorPrescriptions from "./pages/DoctorPrescriptions";
 import DoctorMedicalRecords from "./pages/DoctorMedicalRecords";
 import DoctorAppointments from "./pages/DoctorAppointments";
+
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminUserDetails from "./pages/AdminUserDetails";
-import MedicalRecordDetails from "./pages/MedicalRecordDetails";
 import AdminAppointments from "./pages/AdminAppointments";
+
+import MedicalRecordDetails from "./pages/MedicalRecordDetails";
 
 function App() {
   return (
@@ -29,10 +33,7 @@ function App() {
         {/* PUBLIC ROUTES */}
         {/* ============================= */}
 
-        <Route
-          path="/"
-          element={<Home />}
-        />
+        <Route path="/" element={<Home />} />
 
         <Route
           path="/login"
@@ -47,9 +48,10 @@ function App() {
 
         {/* ============================= */}
         {/* GENERAL PROTECTED ROUTES */}
+        {/* PATIENT */}
         {/* ============================= */}
 
-        <Route element={<ProtectedRoute />}>
+        <Route element={<ProtectedRoute allowedRoles={["patient"]} />}>
 
           <Route
             path="/dashboard"
@@ -67,6 +69,11 @@ function App() {
           />
 
           <Route
+            path="/medical-records/:id"
+            element={<MedicalRecordDetails />}
+          />
+
+          <Route
             path="/prescriptions"
             element={<Prescriptions />}
           />
@@ -74,11 +81,6 @@ function App() {
           <Route
             path="/profile"
             element={<Profile />}
-          />
-
-          <Route
-            path="/medical-records/:id"
-            element={<MedicalRecordDetails />}
           />
 
         </Route>
@@ -90,9 +92,7 @@ function App() {
 
         <Route
           element={
-            <ProtectedRoute
-              allowedRoles={["doctor"]}
-            />
+            <ProtectedRoute allowedRoles={["doctor"]} />
           }
         >
 
@@ -112,11 +112,20 @@ function App() {
           />
 
           <Route
-            path="/create-medical-record"
+            path="/doctor/create-medical-record"
             element={<CreateMedicalRecord />}
           />
-         
-         
+
+          <Route
+            path="/doctor/medical-records/:id"
+            element={<MedicalRecordDetails />}
+          />
+
+          <Route
+            path="/doctor/profile"
+            element={<Profile />}
+          />
+
         </Route>
 
 
@@ -126,9 +135,7 @@ function App() {
 
         <Route
           element={
-            <ProtectedRoute
-              allowedRoles={["admin"]}
-            />
+            <ProtectedRoute allowedRoles={["admin"]} />
           }
         >
 
@@ -148,15 +155,35 @@ function App() {
           />
 
           <Route
-           path="/admin/appointments"
-           element={<AdminAppointments />}
-         />
+            path="/admin/appointments"
+            element={<AdminAppointments />}
+          />
+
+          <Route
+            path="/admin/medical-records"
+            element={<MedicalRecords />}
+          />
+
+          <Route
+            path="/admin/medical-records/:id"
+            element={<MedicalRecordDetails />}
+          />
+
+          <Route
+            path="/admin/prescriptions"
+            element={<Prescriptions />}
+          />
+
+          <Route
+            path="/admin/profile"
+            element={<Profile />}
+          />
 
         </Route>
 
 
         {/* ============================= */}
-        {/* 404 ROUTE */}
+        {/* 404 */}
         {/* ============================= */}
 
         <Route

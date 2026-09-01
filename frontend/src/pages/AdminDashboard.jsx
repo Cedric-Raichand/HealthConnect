@@ -59,16 +59,14 @@ function AdminDashboard() {
 
       {/* HEADER */}
       <header className="dashboard-header">
-
         <Link
-          to="/dashboard"
+          to="/admin/dashboard"
           className="dashboard-logo"
         >
           Health<span>Connect</span>
         </Link>
 
         <div className="dashboard-user">
-
           <div>
             <strong>
               {user?.fullName || "Admin"}
@@ -85,16 +83,13 @@ function AdminDashboard() {
           >
             Logout
           </button>
-
         </div>
-
       </header>
 
       <main className="dashboard-content">
 
         {/* INTRO */}
         <section className="dashboard-welcome">
-
           <p className="eyebrow">
             ADMIN PORTAL
           </p>
@@ -106,7 +101,6 @@ function AdminDashboard() {
           <p>
             Monitor and manage HealthConnect activities.
           </p>
-
         </section>
 
         {/* LOADING */}
@@ -136,7 +130,9 @@ function AdminDashboard() {
                 01
               </span>
 
-              <h2>Total Users</h2>
+              <h2>
+                Total Users
+              </h2>
 
               <strong className="dashboard-stat">
                 {stats.users}
@@ -149,14 +145,16 @@ function AdminDashboard() {
 
             {/* DOCTORS */}
             <Link
-              to="/doctors"
+              to="/admin/users"
               className="dashboard-card"
             >
               <span className="dashboard-card-number">
                 02
               </span>
 
-              <h2>Doctors</h2>
+              <h2>
+                Doctors
+              </h2>
 
               <strong className="dashboard-stat">
                 {stats.doctors}
@@ -176,7 +174,9 @@ function AdminDashboard() {
                 03
               </span>
 
-              <h2>Patients</h2>
+              <h2>
+                Patients
+              </h2>
 
               <strong className="dashboard-stat">
                 {stats.patients}
@@ -189,14 +189,16 @@ function AdminDashboard() {
 
             {/* APPOINTMENTS */}
             <Link
-              to="/appointments"
+              to="/admin/appointments"
               className="dashboard-card"
             >
               <span className="dashboard-card-number">
                 04
               </span>
 
-              <h2>Appointments</h2>
+              <h2>
+                Appointments
+              </h2>
 
               <strong className="dashboard-stat">
                 {stats.appointments}
@@ -209,14 +211,16 @@ function AdminDashboard() {
 
             {/* MEDICAL RECORDS */}
             <Link
-              to="/medical-records"
+              to="/admin/medical-records"
               className="dashboard-card"
             >
               <span className="dashboard-card-number">
                 05
               </span>
 
-              <h2>Medical Records</h2>
+              <h2>
+                Medical Records
+              </h2>
 
               <strong className="dashboard-stat">
                 {stats.medicalRecords}
@@ -229,14 +233,16 @@ function AdminDashboard() {
 
             {/* PRESCRIPTIONS */}
             <Link
-              to="/prescriptions"
+              to="/admin/prescriptions"
               className="dashboard-card"
             >
               <span className="dashboard-card-number">
                 06
               </span>
 
-              <h2>Prescriptions</h2>
+              <h2>
+                Prescriptions
+              </h2>
 
               <strong className="dashboard-stat">
                 {stats.prescriptions}
@@ -252,7 +258,6 @@ function AdminDashboard() {
 
         {/* QUICK ACTIONS */}
         <section className="dashboard-actions">
-
           <h2>
             Admin Actions
           </h2>
@@ -263,24 +268,22 @@ function AdminDashboard() {
               View Appointments
             </Link>
 
-            <Link to="/medical-records">
+            <Link to="/admin/medical-records">
               View Medical Records
             </Link>
 
-            <Link to="/prescriptions">
+            <Link to="/admin/prescriptions">
               View Prescriptions
             </Link>
 
-            <Link to="/profile">
+            <Link to="/admin/profile">
               My Profile
             </Link>
 
           </div>
-
         </section>
 
       </main>
-
     </div>
   );
 }
