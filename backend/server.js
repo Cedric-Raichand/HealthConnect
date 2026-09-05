@@ -2,7 +2,6 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const helmet = require("helmet");
-const path = require("path");
 
 const authRoutes = require("./routes/authRoutes");
 const appointmentRoutes = require("./routes/appointmentRoutes");
@@ -30,7 +29,6 @@ connectDB();
 
 const app = express();
 
-
 // ===============================
 // Security Middleware
 // ===============================
@@ -49,17 +47,6 @@ app.use(express.json());
 
 app.use(apiLimiter);
 
-
-// ===============================
-// Static Files
-// ===============================
-
-app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "uploads"))
-);
-
-
 // ===============================
 // Swagger Documentation
 // ===============================
@@ -69,7 +56,6 @@ app.use(
   swaggerUi.serve,
   swaggerUi.setup(swaggerSpec)
 );
-
 
 // ===============================
 // API Routes
@@ -87,7 +73,6 @@ app.use("/api/users", userRoutes);
 
 app.use("/api/dashboard", dashboardRoutes);
 
-
 // ===============================
 // Health Check
 // ===============================
@@ -96,13 +81,11 @@ app.get("/", (req, res) => {
   res.send("HealthConnect API is running...");
 });
 
-
 // ===============================
 // Global Error Handler
 // ===============================
 
 app.use(errorHandler);
-
 
 // ===============================
 // Start Server
@@ -113,3 +96,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+

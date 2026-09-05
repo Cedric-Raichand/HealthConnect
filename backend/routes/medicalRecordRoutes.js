@@ -1,7 +1,5 @@
 const express = require("express");
-
 const router = express.Router();
-
 const protect = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
 const upload = require("../middleware/uploadmiddleware");
@@ -12,12 +10,12 @@ const {
   createMedicalRecord,
   getMedicalRecords,
   getMedicalRecordById,
+  getMedicalRecordDocument,
 } = require("../controllers/medicalRecordController");
 
 const {
   createMedicalRecordValidator,
 } = require("../middleware/validators/medicalRecordValidator");
-
 
 // ==========================================
 // CREATE MEDICAL RECORD
@@ -34,7 +32,6 @@ router.post(
   createMedicalRecord
 );
 
-
 // ==========================================
 // GET ALL MEDICAL RECORDS
 // Patient, Doctor, Admin
@@ -47,6 +44,19 @@ router.get(
   getMedicalRecords
 );
 
+// ==========================================
+// GET MEDICAL RECORD DOCUMENT
+// Patient, Doctor, Admin
+// ==========================================
+
+router.get(
+  "/:id/documents/:documentId",
+  protect,
+  authorizeRoles("patient", "doctor", "admin"),
+  validateObjectId("id", "medical record"),
+  validateObjectId("documentId", "document"),
+  getMedicalRecordDocument
+);
 
 // ==========================================
 // GET SINGLE MEDICAL RECORD
@@ -60,6 +70,5 @@ router.get(
   validateObjectId("id", "medical record"),
   getMedicalRecordById
 );
-
 
 module.exports = router;
