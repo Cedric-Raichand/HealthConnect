@@ -1,163 +1,337 @@
-const MedicalRecord = require("../models/MedicalRecord");
-const User = require("../models/User");
 const Appointment = require("../models/Appointment");
+const User = require("../models/User");
 
-// ==========================================
-// CREATE MEDICAL RECORD
-// Doctor only
-// ==========================================
-const createMedicalRecord = async (req, res, next) => {
+
+// Book appointment
+const createAppointment = async (req, res, next) => {
   try {
+
     const {
-      patientId,
-      diagnosis,
-      symptoms,
-      treatment,
-      notes,
+      doctorId,
+      appointmentDate,
+      reason
     } = req.body;
 
-    // Check patient exists
-    const patient = await User.findOne({
-      _id: patientId,
-      role: "patient",
+
+    // Validate fields
+    if (!doctorId || !appointmentDate || !reason) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
+
+    // Check appointment date
+    const appointmentTime = new Date(appointmentDate);
+
+
+    if (appointmentTime <= new Date()) {
+      return res.status(400).json({
+        message: "Appointment date must be in the future",
+      });
+    }
+
+
+    // Check doctor exists
+    const doctor = await User.findOne({
+      _id: doctorId,
+      role: "doctor",
     });
 
-    if (!patient) {
+
+    if (!doctor) {
       return res.status(404).json({
-        message: "Patient not found",
+        message: "Doctor not found",
       });
     }
 
-    // Check doctor has an appointment with patient
-    const appointment = await Appointment.findOne({
-      patient: patientId,
-      doctor: req.user._id,
+
+    // Prevent double booking
+    const existingAppointment = await Appointment.findOne({
+      doctor: doctorId,
+      appointmentDate: appointmentTime,
+      status: {
+        $in: ["pending", "confirmed"],
+      },
     });
 
-    if (!appointment) {
-      return res.status(403).json({
-        message:
-          "You can only create medical records for your patients",
+
+    if (existingAppointment) {
+      return res.status(400).json({
+        message: "Doctor is already booked for this time",
       });
     }
 
-    // Store uploaded documents
-    const documents = [];
 
-    if (req.files && req.files.length > 0) {
-      req.files.forEach((file) => {
-        documents.push({
-          fileName: file.filename,
-          filePath: `/uploads/${file.filename}`,
-          fileType: file.mimetype,
-        });
-      });
-    }
+    const appointment = await Appointment.create({
 
-    const medicalRecord = await MedicalRecord.create({
-      patient: patientId,
-      doctor: req.user._id,
-      diagnosis,
-      symptoms,
-      treatment,
-      notes,
-      documents,
+      patient: req.user._id,
+
+      doctor: doctorId,
+
+      appointmentDate: appointmentTime,
+
+      reason,
+
     });
+
 
     res.status(201).json({
-      message: "Medical record created successfully",
-      medicalRecord,
+
+      message: "Appointment booked successfully",
+
+      appointment,
+
     });
+
+
   } catch (error) {
+
     next(error);
+
   }
 };
 
-// ==========================================
-// GET MEDICAL RECORDS
-// ==========================================
-const getMedicalRecords = async (req, res, next) => {
-  try {
-    let records = [];
 
-    // Patient
+
+
+// Get all appointments
+const getAppointments = async (req, res, next) => {
+  try {
+
+    let appointments = [];
+
+
     if (req.user.role === "patient") {
-      records = await MedicalRecord.find({
+
+      appointments = await Appointment.find({
         patient: req.user._id,
       })
         .populate("doctor", "fullName email phone")
-        .sort({ createdAt: -1 });
-    }
+        .sort({ appointmentDate: 1 });
 
-    // Doctor
-    else if (req.user.role === "doctor") {
-      records = await MedicalRecord.find({
+
+    } else if (req.user.role === "doctor") {
+
+      appointments = await Appointment.find({
         doctor: req.user._id,
       })
         .populate("patient", "fullName email phone")
-        .sort({ createdAt: -1 });
-    }
+        .sort({ appointmentDate: 1 });
 
-    // Admin
-    else if (req.user.role === "admin") {
-      records = await MedicalRecord.find()
+
+    } else if (req.user.role === "admin") {
+
+      appointments = await Appointment.find()
         .populate("patient", "fullName email phone")
         .populate("doctor", "fullName email phone")
-        .sort({ createdAt: -1 });
+        .sort({ appointmentDate: 1 });
+
     }
 
+
     res.status(200).json({
-      count: records.length,
-      records,
+
+      count: appointments.length,
+
+      appointments,
+
     });
+
+
   } catch (error) {
+
     next(error);
+
   }
 };
 
-// ==========================================
-// GET SINGLE MEDICAL RECORD
-// ==========================================
-const getMedicalRecordById = async (req, res, next) => {
+
+
+
+// Get single appointment
+const getAppointmentById = async (req, res, next) => {
   try {
-    const record = await MedicalRecord.findById(req.params.id)
+
+    const appointment = await Appointment.findById(req.params.id)
       .populate("patient", "fullName email phone")
       .populate("doctor", "fullName email phone");
 
-    if (!record) {
+
+    if (!appointment) {
       return res.status(404).json({
-        message: "Medical record not found",
+        message: "Appointment not found",
       });
     }
 
-    // Patient can only access their own record
+
     if (
       req.user.role === "patient" &&
-      record.patient._id.toString() !== req.user._id.toString()
+      appointment.patient._id.toString() !== req.user._id.toString()
     ) {
       return res.status(403).json({
         message: "Access denied",
       });
     }
 
-    // Doctor can only access their own records
+
     if (
       req.user.role === "doctor" &&
-      record.doctor._id.toString() !== req.user._id.toString()
+      appointment.doctor._id.toString() !== req.user._id.toString()
     ) {
       return res.status(403).json({
         message: "Access denied",
       });
     }
 
-    res.status(200).json(record);
+
+    res.status(200).json(appointment);
+
+
   } catch (error) {
+
     next(error);
+
   }
 };
 
+
+
+
+// Update appointment status
+const updateAppointmentStatus = async (req, res, next) => {
+  try {
+
+    const {
+      status,
+      notes
+    } = req.body;
+
+
+    const allowedStatuses = [
+      "pending",
+      "confirmed",
+      "completed",
+      "cancelled",
+    ];
+
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        message: "Invalid appointment status",
+      });
+    }
+
+
+    const appointment = await Appointment.findById(req.params.id);
+
+
+    if (!appointment) {
+      return res.status(404).json({
+        message: "Appointment not found",
+      });
+    }
+
+
+    if (
+      req.user.role !== "admin" &&
+      appointment.doctor.toString() !== req.user._id.toString()
+    ) {
+      return res.status(403).json({
+        message: "Not authorized",
+      });
+    }
+
+
+    appointment.status = status;
+
+
+    if (notes) {
+      appointment.notes = notes;
+    }
+
+
+    await appointment.save();
+
+
+    res.status(200).json({
+
+      message: "Appointment updated successfully",
+
+      appointment,
+
+    });
+
+
+  } catch (error) {
+
+    next(error);
+
+  }
+};
+
+
+
+
+// Cancel appointment
+const cancelAppointment = async (req, res, next) => {
+  try {
+
+    const {
+      cancelReason
+    } = req.body;
+
+
+    const appointment = await Appointment.findById(req.params.id);
+
+
+    if (!appointment) {
+      return res.status(404).json({
+        message: "Appointment not found",
+      });
+    }
+
+
+    if (
+      req.user.role === "patient" &&
+      appointment.patient.toString() !== req.user._id.toString()
+    ) {
+      return res.status(403).json({
+        message: "Access denied",
+      });
+    }
+
+
+    appointment.status = "cancelled";
+
+    appointment.cancelReason = cancelReason || "";
+
+
+    await appointment.save();
+
+
+    res.status(200).json({
+
+      message: "Appointment cancelled successfully",
+
+      appointment,
+
+    });
+
+
+  } catch (error) {
+
+    next(error);
+
+  }
+};
+
+
+
 module.exports = {
-  createMedicalRecord,
-  getMedicalRecords,
-  getMedicalRecordById,
+  createAppointment,
+  getAppointments,
+  getAppointmentById,
+  updateAppointmentStatus,
+  cancelAppointment,
 };
