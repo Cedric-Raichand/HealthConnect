@@ -1,11 +1,12 @@
 const MedicalRecord = require("../models/MedicalRecord");
 const User = require("../models/User");
-const path = require("path");
+const Appointment = require("../models/Appointment");
 
 // ==========================================
 // CREATE MEDICAL RECORD
 // Doctor only
 // ==========================================
+
 const createMedicalRecord = async (req, res, next) => {
   try {
     const {
@@ -25,6 +26,20 @@ const createMedicalRecord = async (req, res, next) => {
     if (!patient) {
       return res.status(404).json({
         message: "Patient not found",
+      });
+    }
+
+    // Check doctor has a valid appointment with patient
+    const appointment = await Appointment.findOne({
+      patient: patientId,
+      doctor: req.user._id,
+      status: { $in: ["confirmed", "completed"] },
+    });
+
+    if (!appointment) {
+      return res.status(403).json({
+        message:
+          "You can only create medical records for your patients",
       });
     }
 
@@ -55,7 +70,6 @@ const createMedicalRecord = async (req, res, next) => {
       message: "Medical record created successfully",
       medicalRecord,
     });
-
   } catch (error) {
     next(error);
   }
@@ -64,6 +78,7 @@ const createMedicalRecord = async (req, res, next) => {
 // ==========================================
 // GET MEDICAL RECORDS
 // ==========================================
+
 const getMedicalRecords = async (req, res, next) => {
   try {
     let records = [];
@@ -98,7 +113,6 @@ const getMedicalRecords = async (req, res, next) => {
       count: records.length,
       records,
     });
-
   } catch (error) {
     next(error);
   }
@@ -107,6 +121,7 @@ const getMedicalRecords = async (req, res, next) => {
 // ==========================================
 // GET SINGLE MEDICAL RECORD
 // ==========================================
+
 const getMedicalRecordById = async (req, res, next) => {
   try {
     const record = await MedicalRecord.findById(req.params.id)
@@ -140,68 +155,6 @@ const getMedicalRecordById = async (req, res, next) => {
     }
 
     res.status(200).json(record);
-
-  } catch (error) {
-    next(error);
-  }
-};
-
-// ==========================================
-// GET MEDICAL RECORD DOCUMENT
-// Patient, Doctor, Admin
-// ==========================================
-const getMedicalRecordDocument = async (req, res, next) => {
-  try {
-    const { id, documentId } = req.params;
-
-    // Find medical record
-    const record = await MedicalRecord.findById(id);
-
-    if (!record) {
-      return res.status(404).json({
-        message: "Medical record not found",
-      });
-    }
-
-    // Patient can only access their own record
-    if (
-      req.user.role === "patient" &&
-      record.patient.toString() !== req.user._id.toString()
-    ) {
-      return res.status(403).json({
-        message: "Access denied",
-      });
-    }
-
-    // Doctor can only access their own records
-    if (
-      req.user.role === "doctor" &&
-      record.doctor.toString() !== req.user._id.toString()
-    ) {
-      return res.status(403).json({
-        message: "Access denied",
-      });
-    }
-
-    // Find document inside the medical record
-    const document = record.documents.id(documentId);
-
-    if (!document) {
-      return res.status(404).json({
-        message: "Document not found",
-      });
-    }
-
-    // Convert stored path into an actual filesystem path
-    const filePath = path.join(
-      __dirname,
-      "..",
-      document.filePath
-    );
-
-    // Send file only after authorization
-    res.sendFile(filePath);
-
   } catch (error) {
     next(error);
   }
@@ -211,6 +164,4 @@ module.exports = {
   createMedicalRecord,
   getMedicalRecords,
   getMedicalRecordById,
-  getMedicalRecordDocument,
 };
-
