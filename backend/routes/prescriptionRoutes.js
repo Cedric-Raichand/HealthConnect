@@ -4,6 +4,7 @@ const router = express.Router();
 
 const protect = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
+const validate = require("../middleware/validate");
 const validateObjectId = require("../middleware/validateObjectId");
 
 const {
@@ -12,6 +13,9 @@ const {
   getPrescriptionById,
 } = require("../controllers/prescriptionController");
 
+const {
+  createPrescriptionValidator,
+} = require("../middleware/validators/prescriptionValidator");
 
 // ==========================================
 // CREATE PRESCRIPTION
@@ -22,9 +26,10 @@ router.post(
   "/",
   protect,
   authorizeRoles("doctor"),
+  createPrescriptionValidator,
+  validate,
   createPrescription
 );
-
 
 // ==========================================
 // GET ALL PRESCRIPTIONS
@@ -38,7 +43,6 @@ router.get(
   getPrescriptions
 );
 
-
 // ==========================================
 // GET SINGLE PRESCRIPTION
 // Patient, Doctor, Admin
@@ -51,6 +55,5 @@ router.get(
   validateObjectId("id", "prescription"),
   getPrescriptionById
 );
-
 
 module.exports = router;

@@ -1,7 +1,9 @@
 const { body } = require("express-validator");
 
+// ==========================================
+// CREATE PRESCRIPTION VALIDATION
+// ==========================================
 
-// Create prescription validation
 const createPrescriptionValidator = [
   body("patientId")
     .notEmpty()
@@ -18,28 +20,37 @@ const createPrescriptionValidator = [
   body("medicine")
     .notEmpty()
     .withMessage("Medicine is required")
-    .trim(),
+    .trim()
+    .isLength({ min: 2, max: 200 })
+    .withMessage("Medicine must be between 2 and 200 characters"),
 
   body("dosage")
     .notEmpty()
     .withMessage("Dosage is required")
-    .trim(),
+    .trim()
+    .isLength({ min: 1, max: 200 })
+    .withMessage("Dosage must be between 1 and 200 characters"),
 
   body("frequency")
     .notEmpty()
     .withMessage("Frequency is required")
-    .trim(),
+    .trim()
+    .isLength({ min: 1, max: 200 })
+    .withMessage("Frequency must be between 1 and 200 characters"),
 
   body("duration")
     .notEmpty()
     .withMessage("Duration is required")
-    .trim(),
+    .trim()
+    .isLength({ min: 1, max: 200 })
+    .withMessage("Duration must be between 1 and 200 characters"),
 
   body("instructions")
     .optional()
-    .trim(),
+    .trim()
+    .isLength({ max: 1000 })
+    .withMessage("Instructions cannot exceed 1000 characters"),
 ];
-
 
 module.exports = {
   createPrescriptionValidator,
