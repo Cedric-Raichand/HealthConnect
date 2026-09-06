@@ -6,8 +6,9 @@ const User = require("../models/User");
 
 const getProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id)
-      .select("-password");
+    const user = await User.findById(req.user._id).select(
+      "fullName email role phone profileImage dateOfBirth gender address bloodGroup emergencyContact specialization yearsOfExperience licenseNumber hospital bio isVerified createdAt updatedAt"
+    );
 
     if (!user) {
       return res.status(404).json({
@@ -58,17 +59,10 @@ const updateProfile = async (req, res, next) => {
 
     // Patient fields
     if (req.user.role === "patient") {
-      user.dateOfBirth =
-        dateOfBirth || user.dateOfBirth;
-
-      user.gender =
-        gender || user.gender;
-
-      user.address =
-        address || user.address;
-
-      user.bloodGroup =
-        bloodGroup || user.bloodGroup;
+      user.dateOfBirth = dateOfBirth || user.dateOfBirth;
+      user.gender = gender || user.gender;
+      user.address = address || user.address;
+      user.bloodGroup = bloodGroup || user.bloodGroup;
 
       if (emergencyContact) {
         user.emergencyContact = emergencyContact;
@@ -119,7 +113,9 @@ const getDoctors = async (req, res, next) => {
     const doctors = await User.find({
       role: "doctor",
     })
-      .select("-password")
+      .select(
+        "fullName email role phone profileImage specialization yearsOfExperience hospital bio isVerified"
+      )
       .sort({ fullName: 1 });
 
     res.status(200).json({
@@ -139,7 +135,9 @@ const getDoctors = async (req, res, next) => {
 const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find()
-      .select("-password")
+      .select(
+        "fullName email role phone profileImage dateOfBirth gender address bloodGroup emergencyContact specialization yearsOfExperience licenseNumber hospital bio isVerified createdAt updatedAt"
+      )
       .sort({ createdAt: -1 });
 
     res.status(200).json({
@@ -158,8 +156,9 @@ const getAllUsers = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id)
-      .select("-password");
+    const user = await User.findById(req.params.id).select(
+      "fullName email role phone profileImage dateOfBirth gender address bloodGroup emergencyContact specialization yearsOfExperience licenseNumber hospital bio isVerified createdAt updatedAt"
+    );
 
     if (!user) {
       return res.status(404).json({
@@ -211,6 +210,7 @@ const updateUserVerification = async (req, res, next) => {
       message: isVerified
         ? "User verified successfully"
         : "User unverified successfully",
+
       user: {
         id: user._id,
         fullName: user.fullName,
