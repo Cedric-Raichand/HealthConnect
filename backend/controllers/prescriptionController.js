@@ -2,7 +2,11 @@ const Prescription = require("../models/Prescription");
 const User = require("../models/User");
 const MedicalRecord = require("../models/MedicalRecord");
 
-// Create prescription
+// ==========================================
+// CREATE PRESCRIPTION
+// Doctor only
+// ==========================================
+
 const createPrescription = async (req, res, next) => {
   try {
     const {
@@ -54,7 +58,8 @@ const createPrescription = async (req, res, next) => {
 
     // Ensure doctor owns the medical record
     if (
-      medicalRecord.doctor.toString() !== req.user._id.toString()
+      medicalRecord.doctor.toString() !==
+      req.user._id.toString()
     ) {
       return res.status(403).json({
         message: "You cannot prescribe from this medical record",
@@ -63,7 +68,8 @@ const createPrescription = async (req, res, next) => {
 
     // Ensure the medical record belongs to the selected patient
     if (
-      medicalRecord.patient.toString() !== patientId.toString()
+      medicalRecord.patient.toString() !==
+      patientId.toString()
     ) {
       return res.status(400).json({
         message: "Medical record does not belong to this patient",
@@ -90,7 +96,10 @@ const createPrescription = async (req, res, next) => {
   }
 };
 
-// Get prescriptions
+// ==========================================
+// GET PRESCRIPTIONS
+// ==========================================
+
 const getPrescriptions = async (req, res, next) => {
   try {
     let prescriptions = [];
@@ -100,22 +109,29 @@ const getPrescriptions = async (req, res, next) => {
         patient: req.user._id,
       })
         .populate("doctor", "fullName email")
-        .populate("medicalRecord")
+        .populate(
+          "medicalRecord",
+          "diagnosis symptoms treatment notes createdAt"
+        )
         .sort({ createdAt: -1 });
-
     } else if (req.user.role === "doctor") {
       prescriptions = await Prescription.find({
         doctor: req.user._id,
       })
         .populate("patient", "fullName email")
-        .populate("medicalRecord")
+        .populate(
+          "medicalRecord",
+          "diagnosis symptoms treatment notes createdAt"
+        )
         .sort({ createdAt: -1 });
-
     } else if (req.user.role === "admin") {
       prescriptions = await Prescription.find()
         .populate("patient", "fullName email")
         .populate("doctor", "fullName email")
-        .populate("medicalRecord")
+        .populate(
+          "medicalRecord",
+          "diagnosis symptoms treatment notes createdAt"
+        )
         .sort({ createdAt: -1 });
     }
 
@@ -128,13 +144,19 @@ const getPrescriptions = async (req, res, next) => {
   }
 };
 
-// Get single prescription
+// ==========================================
+// GET SINGLE PRESCRIPTION
+// ==========================================
+
 const getPrescriptionById = async (req, res, next) => {
   try {
     const prescription = await Prescription.findById(req.params.id)
       .populate("patient", "fullName email phone")
       .populate("doctor", "fullName email phone")
-      .populate("medicalRecord");
+      .populate(
+        "medicalRecord",
+        "diagnosis symptoms treatment notes createdAt"
+      );
 
     if (!prescription) {
       return res.status(404).json({
@@ -145,7 +167,8 @@ const getPrescriptionById = async (req, res, next) => {
     // Patients can only access their own prescriptions
     if (
       req.user.role === "patient" &&
-      prescription.patient._id.toString() !== req.user._id.toString()
+      prescription.patient._id.toString() !==
+        req.user._id.toString()
     ) {
       return res.status(403).json({
         message: "Access denied",
@@ -155,7 +178,8 @@ const getPrescriptionById = async (req, res, next) => {
     // Doctors can only access prescriptions they created
     if (
       req.user.role === "doctor" &&
-      prescription.doctor._id.toString() !== req.user._id.toString()
+      prescription.doctor._id.toString() !==
+        req.user._id.toString()
     ) {
       return res.status(403).json({
         message: "Access denied",
@@ -163,7 +187,6 @@ const getPrescriptionById = async (req, res, next) => {
     }
 
     // Admins are allowed to access all prescriptions
-
     res.status(200).json(prescription);
   } catch (error) {
     next(error);
@@ -175,4 +198,3 @@ module.exports = {
   getPrescriptions,
   getPrescriptionById,
 };
-
