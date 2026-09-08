@@ -1,12 +1,13 @@
 const MedicalRecord = require("../models/MedicalRecord");
 const User = require("../models/User");
 const Appointment = require("../models/Appointment");
+const path = require("path");
+const fs = require("fs");
 
 // ==========================================
 // CREATE MEDICAL RECORD
 // Doctor only
 // ==========================================
-
 const createMedicalRecord = async (req, res, next) => {
   try {
     const {
@@ -78,7 +79,6 @@ const createMedicalRecord = async (req, res, next) => {
 // ==========================================
 // GET MEDICAL RECORDS
 // ==========================================
-
 const getMedicalRecords = async (req, res, next) => {
   try {
     let records = [];
@@ -121,7 +121,6 @@ const getMedicalRecords = async (req, res, next) => {
 // ==========================================
 // GET SINGLE MEDICAL RECORD
 // ==========================================
-
 const getMedicalRecordById = async (req, res, next) => {
   try {
     const record = await MedicalRecord.findById(req.params.id)
@@ -160,8 +159,75 @@ const getMedicalRecordById = async (req, res, next) => {
   }
 };
 
+// ==========================================
+// GET MEDICAL RECORD DOCUMENT
+// Protected document access
+// ==========================================
+const getMedicalRecordDocument = async (req, res, next) => {
+  try {
+    const { id, documentId } = req.params;
+
+    const record = await MedicalRecord.findById(id);
+
+    if (!record) {
+      return res.status(404).json({
+        message: "Medical record not found",
+      });
+    }
+
+    // Patient can only access documents from their own record
+    if (
+      req.user.role === "patient" &&
+      record.patient.toString() !== req.user._id.toString()
+    ) {
+      return res.status(403).json({
+        message: "Access denied",
+      });
+    }
+
+    // Doctor can only access documents from their own records
+    if (
+      req.user.role === "doctor" &&
+      record.doctor.toString() !== req.user._id.toString()
+    ) {
+      return res.status(403).json({
+        message: "Access denied",
+      });
+    }
+
+    // Find the requested document inside this medical record
+    const document = record.documents.id(documentId);
+
+    if (!document) {
+      return res.status(404).json({
+        message: "Document not found",
+      });
+    }
+
+    // Build the absolute path to the stored file
+    const filePath = path.resolve(
+      __dirname,
+      "../uploads",
+      document.fileName
+    );
+
+    // Check that the physical file exists
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({
+        message: "Document file not found",
+      });
+    }
+
+    // Send the file only after authorization
+    res.sendFile(filePath);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createMedicalRecord,
   getMedicalRecords,
   getMedicalRecordById,
+  getMedicalRecordDocument,
 };
