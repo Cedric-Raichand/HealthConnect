@@ -20,7 +20,7 @@ import DoctorAppointments from "./pages/DoctorAppointments";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminUserDetails from "./pages/AdminUserDetails";
-import AdminAppointments from "./pages/AdminAppointments";
+
 
 import MedicalRecordDetails from "./pages/MedicalRecordDetails";
 
@@ -51,40 +51,27 @@ function App() {
         {/* PATIENT */}
         {/* ============================= */}
 
-        <Route element={<ProtectedRoute allowedRoles={["patient"]} />}>
+        
+{/* GENERAL PROTECTED ROUTES */}
+<Route
+  element={
+    <ProtectedRoute allowedRoles={["patient", "doctor", "admin"]} />
+  }
+>
+  <Route path="/dashboard" element={<Dashboard />} />
+</Route>
 
-          <Route
-            path="/dashboard"
-            element={<Dashboard />}
-          />
-
-          <Route
-            path="/appointments"
-            element={<Appointments />}
-          />
-
-          <Route
-            path="/medical-records"
-            element={<MedicalRecords />}
-          />
-
-          <Route
-            path="/medical-records/:id"
-            element={<MedicalRecordDetails />}
-          />
-
-          <Route
-            path="/prescriptions"
-            element={<Prescriptions />}
-          />
-
-          <Route
-            path="/profile"
-            element={<Profile />}
-          />
-
-        </Route>
-
+{/* PATIENT ROUTES */}
+<Route element={<ProtectedRoute allowedRoles={["patient"]} />}>
+  <Route path="/appointments" element={<Appointments />} />
+  <Route path="/medical-records" element={<MedicalRecords />} />
+  <Route
+    path="/medical-records/:id"
+    element={<MedicalRecordDetails />}
+  />
+  <Route path="/prescriptions" element={<Prescriptions />} />
+  <Route path="/profile" element={<Profile />} />
+</Route>
 
         {/* ============================= */}
         {/* DOCTOR ROUTES */}
@@ -156,7 +143,7 @@ function App() {
 
           <Route
             path="/admin/appointments"
-            element={<AdminAppointments />}
+            element={<Appointments />}
           />
 
           <Route
