@@ -54,24 +54,24 @@ function App() {
         
          {/* GENERAL PROTECTED ROUTES */}
         <Route
-          element={
+           element={
            <ProtectedRoute allowedRoles={["patient", "doctor", "admin"]} />
            }
-        >
-  <Route path="/dashboard" element={<Dashboard />} />
-</Route>
+           >
+           <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
 
                 {/* PATIENT ROUTES */}
          <Route element={<ProtectedRoute allowedRoles={["patient"]} />}>
             <Route path="/appointments" element={<Appointments />} />
-  <Route path="/medical-records" element={<MedicalRecords />} />
-  <Route
-    path="/medical-records/:id"
-    element={<MedicalRecordDetails />}
-  />
-  <Route path="/prescriptions" element={<Prescriptions />} />
-  <Route path="/profile" element={<Profile />} />
-</Route>
+            <Route path="/medical-records" element={<MedicalRecords />} />
+         <Route
+          path="/medical-records/:id"
+          element={<MedicalRecordDetails />}
+        />
+        <Route path="/prescriptions" element={<Prescriptions />} />
+        <Route path="/profile" element={<Profile />} />
+        </Route>
 
         {/* ============================= */}
         {/* DOCTOR ROUTES */}
