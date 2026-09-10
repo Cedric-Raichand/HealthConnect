@@ -275,7 +275,7 @@ function Dashboard() {
                 {/* Total Appointments */}
 
                 <Link
-                  to="/appointments"
+                  to="/doctor/appointments"
                   className="dashboard-card"
                 >
                   <span className="dashboard-card-number">
@@ -298,7 +298,7 @@ function Dashboard() {
                 {/* Total Patients */}
 
                 <Link
-                  to="/appointments"
+                  to="/doctor/appointments"
                   className="dashboard-card"
                 >
                   <span className="dashboard-card-number">
@@ -321,7 +321,7 @@ function Dashboard() {
                 {/* Pending Appointments */}
 
                 <Link
-                  to="/appointments"
+                  to="/doctor/appointments"
                   className="dashboard-card"
                 >
                   <span className="dashboard-card-number">
@@ -344,7 +344,7 @@ function Dashboard() {
                 {/* Completed Appointments */}
 
                 <Link
-                  to="/appointments"
+                  to="/doctor/appointments"
                   className="dashboard-card"
                 >
                   <span className="dashboard-card-number">
@@ -375,15 +375,15 @@ function Dashboard() {
 
                 <div className="quick-actions">
 
-                  <Link to="/appointments">
+                  <Link to="/doctor/appointments">
                     View Appointments
                   </Link>
 
-                  <Link to="/medical-records">
+                  <Link to="/doctor/medical-records">
                     Medical Records
                   </Link>
 
-                  <Link to="/profile">
+                  <Link to="/doctor/profile">
                     Update Profile
                   </Link>
 
