@@ -8,17 +8,19 @@ function Dashboard() {
   const navigate = useNavigate();
 
   const [stats, setStats] = useState({
-    // Patient statistics
     appointments: 0,
     upcomingAppointments: 0,
     medicalRecords: 0,
     prescriptions: 0,
 
-    // Doctor statistics
     totalAppointments: 0,
     totalPatients: 0,
     pendingAppointments: 0,
     completedAppointments: 0,
+
+    users: 0,
+    doctors: 0,
+    patients: 0,
   });
 
   const [loading, setLoading] = useState(true);
@@ -53,26 +55,22 @@ function Dashboard() {
     navigate("/login");
   };
 
+  const roleLabel = user?.role
+    ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
+    : "Patient";
+
   return (
     <div className="dashboard-page">
-      {/* ==========================================
-          HEADER
-      ========================================== */}
-
+      {/* HEADER */}
       <header className="dashboard-header">
         <Link to="/" className="dashboard-logo">
           Health<span>Connect</span>
         </Link>
 
         <div className="dashboard-user">
-          <div>
-            <strong>
-              {user?.fullName || "User"}
-            </strong>
-
-            <span>
-              {user?.role || "patient"}
-            </span>
+          <div className="dashboard-user-info">
+            <strong>{user?.fullName || "User"}</strong>
+            <span>{roleLabel}</span>
           </div>
 
           <button
@@ -84,20 +82,13 @@ function Dashboard() {
         </div>
       </header>
 
-      {/* ==========================================
-          MAIN CONTENT
-      ========================================== */}
-
+      {/* MAIN CONTENT */}
       <main className="dashboard-content">
-
-        {/* ==========================================
-            WELCOME SECTION
-        ========================================== */}
-
+        {/* WELCOME */}
         <section className="dashboard-welcome">
-          <p className="eyebrow">
+          <span className="eyebrow">
             HEALTHCONNECT DASHBOARD
-          </p>
+          </span>
 
           <h1>
             Welcome, {user?.fullName || "User"} 👋
@@ -108,38 +99,27 @@ function Dashboard() {
           </p>
         </section>
 
-        {/* ==========================================
-            LOADING
-        ========================================== */}
-
+        {/* LOADING */}
         {loading && (
-          <div className="dashboard-message">
-            Loading your dashboard...
+          <div className="dashboard-message dashboard-loading">
+            <div className="dashboard-spinner"></div>
+            <span>Loading your dashboard...</span>
           </div>
         )}
 
-        {/* ==========================================
-            ERROR
-        ========================================== */}
-
+        {/* ERROR */}
         {error && (
-          <div className="error-message">
+          <div className="error-message dashboard-error">
             {error}
           </div>
         )}
 
-        {/* ==========================================
-            PATIENT DASHBOARD
-        ========================================== */}
-
+        {/* PATIENT DASHBOARD */}
         {!loading &&
           !error &&
           user?.role === "patient" && (
             <>
               <section className="dashboard-grid">
-
-                {/* Appointments */}
-
                 <Link
                   to="/appointments"
                   className="dashboard-card"
@@ -148,20 +128,14 @@ function Dashboard() {
                     01
                   </span>
 
-                  <h2>
-                    Appointments
-                  </h2>
+                  <h2>Appointments</h2>
 
                   <strong className="dashboard-stat">
                     {stats.appointments}
                   </strong>
 
-                  <p>
-                    Total appointments
-                  </p>
+                  <p>Total appointments</p>
                 </Link>
-
-                {/* Upcoming */}
 
                 <Link
                   to="/appointments"
@@ -171,9 +145,7 @@ function Dashboard() {
                     02
                   </span>
 
-                  <h2>
-                    Upcoming
-                  </h2>
+                  <h2>Upcoming</h2>
 
                   <strong className="dashboard-stat">
                     {stats.upcomingAppointments}
@@ -184,8 +156,6 @@ function Dashboard() {
                   </p>
                 </Link>
 
-                {/* Medical Records */}
-
                 <Link
                   to="/medical-records"
                   className="dashboard-card"
@@ -194,20 +164,14 @@ function Dashboard() {
                     03
                   </span>
 
-                  <h2>
-                    Medical Records
-                  </h2>
+                  <h2>Medical Records</h2>
 
                   <strong className="dashboard-stat">
                     {stats.medicalRecords}
                   </strong>
 
-                  <p>
-                    Records available
-                  </p>
+                  <p>Records available</p>
                 </Link>
-
-                {/* Prescriptions */}
 
                 <Link
                   to="/prescriptions"
@@ -217,30 +181,23 @@ function Dashboard() {
                     04
                   </span>
 
-                  <h2>
-                    Prescriptions
-                  </h2>
+                  <h2>Prescriptions</h2>
 
                   <strong className="dashboard-stat">
                     {stats.prescriptions}
                   </strong>
 
-                  <p>
-                    Active prescriptions
-                  </p>
+                  <p>Active prescriptions</p>
                 </Link>
-
               </section>
 
-              {/* Patient Quick Actions */}
-
               <section className="dashboard-actions">
-                <h2>
-                  Quick Actions
-                </h2>
+                <div className="dashboard-section-heading">
+                  <span className="eyebrow">SHORTCUTS</span>
+                  <h2>Quick Actions</h2>
+                </div>
 
                 <div className="quick-actions">
-
                   <Link to="/appointments">
                     Book Appointment
                   </Link>
@@ -256,24 +213,17 @@ function Dashboard() {
                   <Link to="/profile">
                     Update Profile
                   </Link>
-
                 </div>
               </section>
             </>
           )}
 
-        {/* ==========================================
-            DOCTOR DASHBOARD
-        ========================================== */}
-
+        {/* DOCTOR DASHBOARD */}
         {!loading &&
           !error &&
           user?.role === "doctor" && (
             <>
               <section className="dashboard-grid">
-
-                {/* Total Appointments */}
-
                 <Link
                   to="/doctor/appointments"
                   className="dashboard-card"
@@ -282,20 +232,14 @@ function Dashboard() {
                     01
                   </span>
 
-                  <h2>
-                    Total Appointments
-                  </h2>
+                  <h2>Total Appointments</h2>
 
                   <strong className="dashboard-stat">
                     {stats.totalAppointments}
                   </strong>
 
-                  <p>
-                    Appointments assigned to you
-                  </p>
+                  <p>Appointments assigned to you</p>
                 </Link>
-
-                {/* Total Patients */}
 
                 <Link
                   to="/doctor/appointments"
@@ -305,9 +249,7 @@ function Dashboard() {
                     02
                   </span>
 
-                  <h2>
-                    Total Patients
-                  </h2>
+                  <h2>Total Patients</h2>
 
                   <strong className="dashboard-stat">
                     {stats.totalPatients}
@@ -318,8 +260,6 @@ function Dashboard() {
                   </p>
                 </Link>
 
-                {/* Pending Appointments */}
-
                 <Link
                   to="/doctor/appointments"
                   className="dashboard-card"
@@ -328,20 +268,14 @@ function Dashboard() {
                     03
                   </span>
 
-                  <h2>
-                    Pending
-                  </h2>
+                  <h2>Pending</h2>
 
                   <strong className="dashboard-stat">
                     {stats.pendingAppointments}
                   </strong>
 
-                  <p>
-                    Appointments awaiting action
-                  </p>
+                  <p>Appointments awaiting action</p>
                 </Link>
-
-                {/* Completed Appointments */}
 
                 <Link
                   to="/doctor/appointments"
@@ -351,30 +285,23 @@ function Dashboard() {
                     04
                   </span>
 
-                  <h2>
-                    Completed
-                  </h2>
+                  <h2>Completed</h2>
 
                   <strong className="dashboard-stat">
                     {stats.completedAppointments}
                   </strong>
 
-                  <p>
-                    Completed appointments
-                  </p>
+                  <p>Completed appointments</p>
                 </Link>
-
               </section>
 
-              {/* Doctor Quick Actions */}
-
               <section className="dashboard-actions">
-                <h2>
-                  Quick Actions
-                </h2>
+                <div className="dashboard-section-heading">
+                  <span className="eyebrow">SHORTCUTS</span>
+                  <h2>Quick Actions</h2>
+                </div>
 
                 <div className="quick-actions">
-
                   <Link to="/doctor/appointments">
                     View Appointments
                   </Link>
@@ -386,122 +313,112 @@ function Dashboard() {
                   <Link to="/doctor/profile">
                     Update Profile
                   </Link>
-
                 </div>
               </section>
             </>
           )}
 
-        {/* ==========================================
-            ADMIN DASHBOARD
-        ========================================== */}
-
+        {/* ADMIN DASHBOARD */}
         {!loading &&
           !error &&
           user?.role === "admin" && (
             <>
               <section className="dashboard-grid">
-
-                <div className="dashboard-card">
+                <Link
+                  to="/admin/users"
+                  className="dashboard-card"
+                >
                   <span className="dashboard-card-number">
                     01
                   </span>
 
-                  <h2>
-                    Users
-                  </h2>
+                  <h2>Users</h2>
 
                   <strong className="dashboard-stat">
                     {stats.users || 0}
                   </strong>
 
-                  <p>
-                    Total registered users
-                  </p>
-                </div>
+                  <p>Total registered users</p>
+                </Link>
 
-                <div className="dashboard-card">
+                <Link
+                  to="/admin/users"
+                  className="dashboard-card"
+                >
                   <span className="dashboard-card-number">
                     02
                   </span>
 
-                  <h2>
-                    Doctors
-                  </h2>
+                  <h2>Doctors</h2>
 
                   <strong className="dashboard-stat">
                     {stats.doctors || 0}
                   </strong>
 
-                  <p>
-                    Registered doctors
-                  </p>
-                </div>
+                  <p>Registered doctors</p>
+                </Link>
 
-                <div className="dashboard-card">
+                <Link
+                  to="/admin/users"
+                  className="dashboard-card"
+                >
                   <span className="dashboard-card-number">
                     03
                   </span>
 
-                  <h2>
-                    Patients
-                  </h2>
+                  <h2>Patients</h2>
 
                   <strong className="dashboard-stat">
                     {stats.patients || 0}
                   </strong>
 
-                  <p>
-                    Registered patients
-                  </p>
-                </div>
+                  <p>Registered patients</p>
+                </Link>
 
-                <div className="dashboard-card">
+                <Link
+                  to="/admin/appointments"
+                  className="dashboard-card"
+                >
                   <span className="dashboard-card-number">
                     04
                   </span>
 
-                  <h2>
-                    Appointments
-                  </h2>
+                  <h2>Appointments</h2>
 
                   <strong className="dashboard-stat">
                     {stats.appointments || 0}
                   </strong>
 
-                  <p>
-                    Total appointments
-                  </p>
-                </div>
-
+                  <p>Total appointments</p>
+                </Link>
               </section>
 
-              {/* Admin Quick Actions */}
-
               <section className="dashboard-actions">
-                <h2>
-                  Quick Actions
-                </h2>
+                <div className="dashboard-section-heading">
+                  <span className="eyebrow">ADMIN TOOLS</span>
+                  <h2>Quick Actions</h2>
+                </div>
 
                 <div className="quick-actions">
+                  <Link to="/admin/users">
+                    Manage Users
+                  </Link>
 
-                  <Link to="/appointments">
+                  <Link to="/admin/appointments">
                     View Appointments
                   </Link>
 
-                  <Link to="/medical-records">
+                  <Link to="/admin/medical-records">
                     Medical Records
                   </Link>
 
-                  <Link to="/profile">
-                    Update Profile
+                  <Link to="/admin/prescriptions">
+                    Prescriptions
                   </Link>
-
                 </div>
               </section>
             </>
           )}
-
       </main>
     </div>
   );
