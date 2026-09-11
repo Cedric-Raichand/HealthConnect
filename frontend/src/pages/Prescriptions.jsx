@@ -38,6 +38,7 @@ function Prescriptions() {
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-GH", {
+      weekday: "short",
       day: "numeric",
       month: "short",
       year: "numeric",
@@ -46,34 +47,32 @@ function Prescriptions() {
 
   const isAdmin = user?.role === "admin";
 
+  const dashboardPath = isAdmin
+    ? "/admin/dashboard"
+    : "/dashboard";
+
   return (
     <div className="dashboard-page">
-
       {/* HEADER */}
       <header className="dashboard-header">
-
         <Link
-          to={isAdmin ? "/admin/dashboard" : "/dashboard"}
+          to={dashboardPath}
           className="dashboard-logo"
         >
           Health<span>Connect</span>
         </Link>
 
         <Link
-          to={isAdmin ? "/admin/dashboard" : "/dashboard"}
+          to={dashboardPath}
           className="back-button"
         >
           ← {isAdmin ? "Admin Dashboard" : "Dashboard"}
         </Link>
-
       </header>
 
-      {/* CONTENT */}
       <main className="dashboard-content">
-
-        {/* PAGE INTRO */}
+        {/* INTRO */}
         <section className="dashboard-welcome">
-
           <p className="eyebrow">
             {isAdmin ? "ADMIN PORTAL" : "HEALTHCARE"}
           </p>
@@ -87,9 +86,8 @@ function Prescriptions() {
           <p>
             {isAdmin
               ? "View prescriptions issued to patients across HealthConnect."
-              : "View medicines prescribed by your doctors."}
+              : "View medicines prescribed by your doctors and follow your treatment instructions."}
           </p>
-
         </section>
 
         {/* LOADING */}
@@ -110,7 +108,10 @@ function Prescriptions() {
         {!loading &&
           !error &&
           prescriptions.length === 0 && (
-            <div className="empty-state">
+            <div className="empty-state prescription-empty-state">
+              <div className="prescription-empty-icon">
+                💊
+              </div>
 
               <h2>
                 {isAdmin
@@ -124,6 +125,14 @@ function Prescriptions() {
                   : "Your prescriptions will appear here when a doctor prescribes medication for you."}
               </p>
 
+              {!isAdmin && (
+                <Link
+                  to="/appointments"
+                  className="medical-record-view-button"
+                >
+                  View Appointments
+                </Link>
+              )}
             </div>
           )}
 
@@ -131,182 +140,191 @@ function Prescriptions() {
         {!loading &&
           !error &&
           prescriptions.length > 0 && (
-            <section className="appointments-section">
+            <section className="prescriptions-section">
+              <div className="prescriptions-heading">
+                <div>
+                  <span className="medical-record-label">
+                    MEDICATION
+                  </span>
 
-              <h2>
-                {isAdmin
-                  ? `All Prescriptions (${prescriptions.length})`
-                  : "Your Prescriptions"}
-              </h2>
+                  <h2>
+                    {isAdmin
+                      ? "Prescription Records"
+                      : "Your Prescriptions"}
+                  </h2>
+                </div>
 
-              <div className="appointments-list">
+                <span className="prescription-count">
+                  {prescriptions.length}{" "}
+                  {prescriptions.length === 1
+                    ? "prescription"
+                    : "prescriptions"}
+                </span>
+              </div>
 
+              <div className="prescriptions-grid">
                 {prescriptions.map((prescription) => (
-
-                  <div
-                    className="appointment-card"
+                  <article
+                    className="prescription-card"
                     key={prescription._id}
                   >
-
-                    {/* TOP */}
-                    <div className="appointment-main">
-
+                    {/* CARD HEADER */}
+                    <div className="prescription-card-header">
                       <div>
-
-                        <span className="appointment-label">
-                          Prescription
+                        <span className="prescription-label">
+                          PRESCRIPTION
                         </span>
 
                         <h2>
                           {prescription.medicine}
                         </h2>
 
-                        {/* PATIENT - ADMIN ONLY */}
                         {isAdmin &&
                           prescription.patient && (
-                            <p>
+                            <p className="prescription-patient">
                               Patient:{" "}
                               <strong>
-                                {prescription.patient.fullName}
+                                {
+                                  prescription.patient
+                                    .fullName
+                                }
                               </strong>
                             </p>
                           )}
 
-                        {/* DOCTOR */}
                         {prescription.doctor && (
-                          <p>
+                          <p className="prescription-doctor">
                             Prescribed by{" "}
                             <strong>
-                              {prescription.doctor.fullName}
+                              {
+                                prescription.doctor
+                                  .fullName
+                              }
                             </strong>
                           </p>
                         )}
-
                       </div>
 
-                      <span className="status-badge status-confirmed">
-                        Active
-                      </span>
-
+                      <div className="prescription-icon">
+                        💊
+                      </div>
                     </div>
 
-                    {/* DETAILS */}
-                    <div className="appointment-details">
-
-                      <div>
+                    {/* MEDICATION DETAILS */}
+                    <div className="prescription-details">
+                      <div className="prescription-detail">
                         <span>Dosage</span>
-
                         <strong>
-                          {prescription.dosage}
+                          {prescription.dosage ||
+                            "Not provided"}
                         </strong>
                       </div>
 
-                      <div>
+                      <div className="prescription-detail">
                         <span>Frequency</span>
-
                         <strong>
-                          {prescription.frequency}
+                          {prescription.frequency ||
+                            "Not provided"}
                         </strong>
                       </div>
 
-                      <div>
+                      <div className="prescription-detail">
                         <span>Duration</span>
-
                         <strong>
-                          {prescription.duration}
+                          {prescription.duration ||
+                            "Not provided"}
                         </strong>
                       </div>
 
-                      <div>
+                      <div className="prescription-detail">
                         <span>Date Prescribed</span>
-
                         <strong>
                           {formatDate(
                             prescription.createdAt
                           )}
                         </strong>
                       </div>
-
                     </div>
+
+                    {/* INSTRUCTIONS */}
+                    {prescription.instructions && (
+                      <div className="prescription-instructions">
+                        <span>Instructions</span>
+
+                        <p>
+                          {prescription.instructions}
+                        </p>
+                      </div>
+                    )}
 
                     {/* ADMIN PATIENT DETAILS */}
                     {isAdmin &&
                       prescription.patient && (
-                        <div className="appointment-details">
+                        <div className="prescription-contact-section">
+                          <h3>Patient Information</h3>
 
-                          <div>
-                            <span>Patient Email</span>
+                          <div className="prescription-contact-grid">
+                            <div>
+                              <span>Email</span>
+                              <strong>
+                                {prescription.patient
+                                  .email ||
+                                  "Not provided"}
+                              </strong>
+                            </div>
 
-                            <strong>
-                              {prescription.patient.email ||
-                                "Not provided"}
-                            </strong>
+                            <div>
+                              <span>Phone</span>
+                              <strong>
+                                {prescription.patient
+                                  .phone ||
+                                  "Not provided"}
+                              </strong>
+                            </div>
                           </div>
-
-                          <div>
-                            <span>Patient Phone</span>
-
-                            <strong>
-                              {prescription.patient.phone ||
-                                "Not provided"}
-                            </strong>
-                          </div>
-
                         </div>
                       )}
 
-                    {/* DOCTOR DETAILS */}
+                    {/* ADMIN DOCTOR DETAILS */}
                     {isAdmin &&
                       prescription.doctor && (
-                        <div className="appointment-details">
+                        <div className="prescription-contact-section">
+                          <h3>Doctor Information</h3>
 
-                          <div>
-                            <span>Doctor Email</span>
+                          <div className="prescription-contact-grid">
+                            <div>
+                              <span>Email</span>
+                              <strong>
+                                {prescription.doctor
+                                  .email ||
+                                  "Not provided"}
+                              </strong>
+                            </div>
 
-                            <strong>
-                              {prescription.doctor.email ||
-                                "Not provided"}
-                            </strong>
+                            <div>
+                              <span>Phone</span>
+                              <strong>
+                                {prescription.doctor
+                                  .phone ||
+                                  "Not provided"}
+                              </strong>
+                            </div>
                           </div>
-
-                          <div>
-                            <span>Doctor Phone</span>
-
-                            <strong>
-                              {prescription.doctor.phone ||
-                                "Not provided"}
-                            </strong>
-                          </div>
-
                         </div>
                       )}
 
-                    {/* INSTRUCTIONS */}
-                    {prescription.instructions && (
-                      <div className="appointment-details">
-
-                        <div>
-                          <span>Instructions</span>
-
-                          <strong>
-                            {prescription.instructions}
-                          </strong>
-                        </div>
-
-                      </div>
-                    )}
-
-                  </div>
-
+                    {/* FOOTER */}
+                    <div className="prescription-card-footer">
+                      <span>
+                        Prescription record
+                      </span>
+                    </div>
+                  </article>
                 ))}
-
               </div>
-
             </section>
           )}
-
       </main>
-
     </div>
   );
 }
