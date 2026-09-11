@@ -2366,3 +2366,189 @@ a {
     justify-content: center;
   }
 }
+/* ==========================================
+   CREATE MEDICAL RECORD
+========================================== */
+
+.doctor-create-record {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+}
+
+.doctor-create-record-header {
+  margin-bottom: 28px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.doctor-create-record-header h2 {
+  margin: 8px 0;
+  font-size: 1.5rem;
+}
+
+.doctor-create-record-header p {
+  margin: 0;
+  color: #64748b;
+}
+
+.doctor-create-record-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.doctor-create-record-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.doctor-create-record-form label {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.doctor-create-record-form label span {
+  color: #dc2626;
+}
+
+.doctor-create-record-form input,
+.doctor-create-record-form select,
+.doctor-create-record-form textarea {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #1f2937;
+  font: inherit;
+  transition: border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.doctor-create-record-form textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.doctor-create-record-form input:focus,
+.doctor-create-record-form select:focus,
+.doctor-create-record-form textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.doctor-create-record-form input:disabled,
+.doctor-create-record-form select:disabled,
+.doctor-create-record-form textarea:disabled {
+  background: #f8fafc;
+  cursor: not-allowed;
+}
+
+.doctor-create-record-form small {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+/* FILE INPUT */
+
+.doctor-create-record-form input[type="file"] {
+  padding: 10px;
+  cursor: pointer;
+  background: #f8fafc;
+}
+
+/* SELECTED DOCUMENTS */
+
+.selected-documents {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  margin-top: 4px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.selected-documents strong {
+  font-size: 0.9rem;
+  color: #334155;
+}
+
+.selected-document {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #ffffff;
+  border-radius: 8px;
+  color: #475569;
+  font-size: 0.9rem;
+  word-break: break-word;
+}
+
+/* ACTIONS */
+
+.doctor-create-record-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.doctor-create-record-actions .auth-button {
+  width: auto;
+  min-width: 190px;
+}
+
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #334155;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.secondary-button:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+  .doctor-create-record {
+    padding: 20px;
+    border-radius: 14px;
+  }
+
+  .doctor-create-record-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .doctor-create-record-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .doctor-create-record-actions .auth-button,
+  .secondary-button {
+    width: 100%;
+  }
+}

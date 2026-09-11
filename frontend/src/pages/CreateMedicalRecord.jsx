@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+
 import api from "../services/api";
 
 function CreateMedicalRecord() {
-  const navigate = useNavigate();
-
   const [patients, setPatients] = useState([]);
 
   const [formData, setFormData] = useState({
@@ -16,10 +15,8 @@ function CreateMedicalRecord() {
   });
 
   const [documents, setDocuments] = useState([]);
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -38,8 +35,7 @@ function CreateMedicalRecord() {
 
       const response = await api.get("/appointments");
 
-      const appointments =
-        response.data.appointments || [];
+      const appointments = response.data.appointments || [];
 
       // Get unique patients from appointments
       const uniquePatients = [];
@@ -60,10 +56,7 @@ function CreateMedicalRecord() {
 
       setPatients(uniquePatients);
     } catch (error) {
-      console.error(
-        "Patients error:",
-        error
-      );
+      console.error("Patients error:", error);
 
       setError(
         error.response?.data?.message ||
@@ -83,6 +76,15 @@ function CreateMedicalRecord() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+
+    // Clear previous messages when doctor starts editing
+    if (error) {
+      setError("");
+    }
+
+    if (success) {
+      setSuccess("");
+    }
   };
 
   // ==========================================
@@ -90,9 +92,16 @@ function CreateMedicalRecord() {
   // ==========================================
 
   const handleFileChange = (e) => {
-    setDocuments(
-      Array.from(e.target.files)
-    );
+    const selectedFiles = Array.from(e.target.files);
+
+    if (selectedFiles.length > 5) {
+      setError("You can upload a maximum of 5 documents.");
+      setDocuments(selectedFiles.slice(0, 5));
+      return;
+    }
+
+    setError("");
+    setDocuments(selectedFiles);
   };
 
   // ==========================================
@@ -107,14 +116,13 @@ function CreateMedicalRecord() {
 
     if (
       !formData.patientId ||
-      !formData.diagnosis ||
-      !formData.symptoms ||
-      !formData.treatment
+      !formData.diagnosis.trim() ||
+      !formData.symptoms.trim() ||
+      !formData.treatment.trim()
     ) {
       setError(
-        "Please fill in all required fields."
+        "Please complete all required fields before creating the record."
       );
-
       return;
     }
 
@@ -123,48 +131,24 @@ function CreateMedicalRecord() {
 
       const data = new FormData();
 
-      data.append(
-        "patientId",
-        formData.patientId
-      );
-
-      data.append(
-        "diagnosis",
-        formData.diagnosis
-      );
-
-      data.append(
-        "symptoms",
-        formData.symptoms
-      );
-
-      data.append(
-        "treatment",
-        formData.treatment
-      );
-
-      data.append(
-        "notes",
-        formData.notes
-      );
+      data.append("patientId", formData.patientId);
+      data.append("diagnosis", formData.diagnosis);
+      data.append("symptoms", formData.symptoms);
+      data.append("treatment", formData.treatment);
+      data.append("notes", formData.notes);
 
       documents.forEach((file) => {
         data.append("documents", file);
       });
 
-      await api.post(
-        "/medical-records",
-        data,
-        {
-          headers: {
-            "Content-Type":
-              "multipart/form-data",
-          },
-        }
-      );
+      await api.post("/medical-records", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       setSuccess(
-        "Medical record created successfully!"
+        "Medical record created successfully."
       );
 
       setFormData({
@@ -178,10 +162,11 @@ function CreateMedicalRecord() {
       setDocuments([]);
 
       // Reset file input
-      document.getElementById(
-        "documents"
-      ).value = "";
+      const fileInput = document.getElementById("documents");
 
+      if (fileInput) {
+        fileInput.value = "";
+      }
     } catch (error) {
       console.error(
         "Medical record error:",
@@ -206,7 +191,6 @@ function CreateMedicalRecord() {
   return (
     <div className="dashboard-page">
       {/* HEADER */}
-
       <header className="dashboard-header">
         <Link
           to="/dashboard"
@@ -216,39 +200,42 @@ function CreateMedicalRecord() {
         </Link>
 
         <Link
-          to="/dashboard"
+          to="/doctor/medical-records"
           className="back-button"
         >
-          ← Dashboard
+          ← Medical Records
         </Link>
       </header>
 
       <main className="dashboard-content">
-
         {/* INTRO */}
-
         <section className="dashboard-welcome">
-          <p className="eyebrow">
-            DOCTOR PORTAL
-          </p>
+          <p className="eyebrow">DOCTOR PORTAL</p>
 
-          <h1>
-            Create Medical Record
-          </h1>
+          <h1>Create Medical Record</h1>
 
           <p>
-            Create a medical record for one of
-            your patients.
+            Record important clinical information for
+            one of your patients.
           </p>
         </section>
 
-        {/* FORM */}
+        {/* FORM CARD */}
+        <section className="doctor-create-record">
+          <div className="doctor-create-record-header">
+            <div>
+              <span className="medical-record-label">
+                NEW RECORD
+              </span>
 
-        <section className="booking-section">
+              <h2>Patient Medical Record</h2>
 
-          <h2>
-            Patient Medical Record
-          </h2>
+              <p>
+                Complete the information below to create
+                a medical record.
+              </p>
+            </div>
+          </div>
 
           {error && (
             <div className="error-message">
@@ -268,27 +255,29 @@ function CreateMedicalRecord() {
             </div>
           ) : patients.length === 0 ? (
             <div className="empty-state">
-              <h3>
-                No patients found
-              </h3>
+              <h3>No patients found</h3>
 
               <p>
-                Patients who have booked
-                appointments with you will
-                appear here.
+                Patients who have booked appointments
+                with you will appear here.
               </p>
+
+              <Link
+                to="/doctor/appointments"
+                className="medical-record-view-button"
+              >
+                View Appointments
+              </Link>
             </div>
           ) : (
             <form
               onSubmit={handleSubmit}
-              className="booking-form"
+              className="doctor-create-record-form"
             >
-
               {/* PATIENT */}
-
               <div className="form-group">
                 <label htmlFor="patientId">
-                  Select Patient
+                  Patient <span>*</span>
                 </label>
 
                 <select
@@ -296,80 +285,93 @@ function CreateMedicalRecord() {
                   name="patientId"
                   value={formData.patientId}
                   onChange={handleChange}
+                  disabled={saving}
                 >
                   <option value="">
                     Select a patient
                   </option>
 
-                  {patients.map(
-                    (patient) => (
-                      <option
-                        key={patient._id}
-                        value={patient._id}
-                      >
-                        {patient.fullName}
-                        {patient.email
-                          ? ` - ${patient.email}`
-                          : ""}
-                      </option>
-                    )
-                  )}
+                  {patients.map((patient) => (
+                    <option
+                      key={patient._id}
+                      value={patient._id}
+                    >
+                      {patient.fullName}
+                      {patient.email
+                        ? ` - ${patient.email}`
+                        : ""}
+                    </option>
+                  ))}
                 </select>
+
+                <small>
+                  Select a patient from your appointment
+                  history.
+                </small>
               </div>
 
               {/* DIAGNOSIS */}
-
               <div className="form-group">
                 <label htmlFor="diagnosis">
-                  Diagnosis
+                  Diagnosis <span>*</span>
                 </label>
 
                 <input
                   id="diagnosis"
                   type="text"
                   name="diagnosis"
-                  placeholder="Enter diagnosis"
+                  placeholder="e.g. Malaria"
                   value={formData.diagnosis}
                   onChange={handleChange}
+                  disabled={saving}
                 />
               </div>
 
               {/* SYMPTOMS */}
-
               <div className="form-group">
                 <label htmlFor="symptoms">
-                  Symptoms
+                  Symptoms <span>*</span>
                 </label>
 
                 <textarea
                   id="symptoms"
                   name="symptoms"
-                  rows="4"
+                  rows="5"
                   placeholder="Describe the patient's symptoms..."
                   value={formData.symptoms}
                   onChange={handleChange}
+                  disabled={saving}
                 />
+
+                <small>
+                  Include the symptoms reported or
+                  observed during the consultation.
+                </small>
               </div>
 
               {/* TREATMENT */}
-
               <div className="form-group">
                 <label htmlFor="treatment">
-                  Treatment
+                  Treatment <span>*</span>
                 </label>
 
                 <textarea
                   id="treatment"
                   name="treatment"
-                  rows="4"
+                  rows="5"
                   placeholder="Describe the recommended treatment..."
                   value={formData.treatment}
                   onChange={handleChange}
+                  disabled={saving}
                 />
+
+                <small>
+                  Include the treatment or care plan
+                  provided to the patient.
+                </small>
               </div>
 
               {/* NOTES */}
-
               <div className="form-group">
                 <label htmlFor="notes">
                   Doctor's Notes
@@ -378,15 +380,15 @@ function CreateMedicalRecord() {
                 <textarea
                   id="notes"
                   name="notes"
-                  rows="4"
-                  placeholder="Additional notes..."
+                  rows="5"
+                  placeholder="Add any additional clinical notes..."
                   value={formData.notes}
                   onChange={handleChange}
+                  disabled={saving}
                 />
               </div>
 
               {/* DOCUMENTS */}
-
               <div className="form-group">
                 <label htmlFor="documents">
                   Medical Documents
@@ -397,38 +399,52 @@ function CreateMedicalRecord() {
                   type="file"
                   multiple
                   onChange={handleFileChange}
+                  disabled={saving}
                 />
 
                 <small>
-                  You can upload up to 5
-                  documents.
+                  Upload up to 5 medical documents.
                 </small>
 
                 {documents.length > 0 && (
-                  <div>
-                    {documents.map(
-                      (file, index) => (
-                        <p key={index}>
-                          📄 {file.name}
-                        </p>
-                      )
-                    )}
+                  <div className="selected-documents">
+                    <strong>
+                      Selected documents ({documents.length})
+                    </strong>
+
+                    {documents.map((file, index) => (
+                      <div
+                        className="selected-document"
+                        key={`${file.name}-${index}`}
+                      >
+                        <span>📄</span>
+
+                        <span>{file.name}</span>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
 
-              {/* SUBMIT */}
+              {/* ACTIONS */}
+              <div className="doctor-create-record-actions">
+                <Link
+                  to="/doctor/medical-records"
+                  className="secondary-button"
+                >
+                  Cancel
+                </Link>
 
-              <button
-                type="submit"
-                className="auth-button"
-                disabled={saving}
-              >
-                {saving
-                  ? "Creating Record..."
-                  : "Create Medical Record"}
-              </button>
-
+                <button
+                  type="submit"
+                  className="auth-button"
+                  disabled={saving}
+                >
+                  {saving
+                    ? "Creating Record..."
+                    : "Create Medical Record"}
+                </button>
+              </div>
             </form>
           )}
         </section>
