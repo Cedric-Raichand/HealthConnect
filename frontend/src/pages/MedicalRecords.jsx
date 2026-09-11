@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -36,6 +35,10 @@ function MedicalRecords() {
   };
 
   const formatDate = (date) => {
+    if (!date) {
+      return "Date unavailable";
+    }
+
     return new Date(date).toLocaleDateString("en-GH", {
       weekday: "short",
       day: "numeric",
@@ -47,40 +50,55 @@ function MedicalRecords() {
   const isAdmin = user?.role === "admin";
   const isDoctor = user?.role === "doctor";
 
+  const dashboardPath = isAdmin
+    ? "/admin/dashboard"
+    : "/dashboard";
+
   return (
     <div className="dashboard-page">
-
       {/* HEADER */}
       <header className="dashboard-header">
-
         <Link
-          to={isAdmin ? "/admin/dashboard" : "/dashboard"}
+          to={dashboardPath}
           className="dashboard-logo"
         >
           Health<span>Connect</span>
         </Link>
 
-        <Link
-          to={isAdmin ? "/admin/dashboard" : "/dashboard"}
-          className="back-button"
-        >
-          ← {isAdmin ? "Admin Dashboard" : "Dashboard"}
-        </Link>
+        <div className="dashboard-user">
+          <div className="dashboard-user-info">
+            <strong>
+              {user?.fullName || "User"}
+            </strong>
 
+            <span>
+              {isAdmin
+                ? "Admin"
+                : isDoctor
+                ? "Doctor"
+                : "Patient"}
+            </span>
+          </div>
+
+          <Link
+            to={dashboardPath}
+            className="back-button"
+          >
+            ← Dashboard
+          </Link>
+        </div>
       </header>
 
       <main className="dashboard-content">
-
         {/* PAGE INTRO */}
         <section className="dashboard-welcome">
-
-          <p className="eyebrow">
+          <span className="eyebrow">
             {isAdmin
               ? "ADMIN PORTAL"
               : isDoctor
               ? "HEALTHCARE"
               : "HEALTHCARE"}
-          </p>
+          </span>
 
           <h1>
             {isAdmin
@@ -92,20 +110,12 @@ function MedicalRecords() {
 
           <p>
             {isAdmin
-              ? "View and monitor all medical records across HealthConnect."
+              ? "View and monitor medical records across HealthConnect."
               : isDoctor
               ? "View medical records created for your patients."
               : "View your medical history, diagnoses, treatments and other healthcare information."}
           </p>
-
         </section>
-
-        {/* LOADING */}
-        {loading && (
-          <div className="dashboard-message">
-            Loading medical records...
-          </div>
-        )}
 
         {/* ERROR */}
         {!loading && error && (
@@ -114,15 +124,24 @@ function MedicalRecords() {
           </div>
         )}
 
+        {/* LOADING */}
+        {loading && (
+          <div className="dashboard-message medical-records-loading">
+            <div className="dashboard-spinner"></div>
+            <span>Loading medical records...</span>
+          </div>
+        )}
+
         {/* EMPTY STATE */}
         {!loading &&
           !error &&
           records.length === 0 && (
-            <div className="empty-state">
+            <div className="empty-state medical-records-empty">
+              <div className="medical-records-empty-icon">
+                +
+              </div>
 
-              <h2>
-                No medical records yet
-              </h2>
+              <h2>No medical records yet</h2>
 
               <p>
                 {isAdmin
@@ -131,7 +150,6 @@ function MedicalRecords() {
                   ? "Medical records you create for patients will appear here."
                   : "Your medical records will appear here after a doctor creates one for you."}
               </p>
-
             </div>
           )}
 
@@ -140,167 +158,172 @@ function MedicalRecords() {
           !error &&
           records.length > 0 && (
             <section className="medical-records-list">
+              <div className="medical-records-heading">
+                <div>
+                  <span className="eyebrow">
+                    RECORD HISTORY
+                  </span>
 
-              <h2>
-                {isAdmin
-                  ? `All Medical Records (${records.length})`
-                  : isDoctor
-                  ? "Your Medical Records"
-                  : "Your Medical Records"}
-              </h2>
+                  <h2>
+                    {isAdmin
+                      ? "All Medical Records"
+                      : "Your Medical Records"}
+                  </h2>
+                </div>
 
-              {records.map((record) => (
-                <article
-                  className="medical-record-card"
-                  key={record._id}
-                >
+                <span className="medical-record-count">
+                  {records.length}{" "}
+                  {records.length === 1
+                    ? "record"
+                    : "records"}
+                </span>
+              </div>
 
-                  {/* RECORD HEADER */}
-                  <div className="medical-record-header">
-
-                    <div>
-
-                      <span className="appointment-label">
-                        Medical Record
-                      </span>
-
-                      <h2>
-                        {record.diagnosis}
-                      </h2>
-
-                      <p>
-                        Created on{" "}
-                        {formatDate(record.createdAt)}
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                  {/* ADMIN / DOCTOR / PATIENT INFORMATION */}
-                  <div className="record-section">
-
-                    <span>Patient</span>
-
-                    <strong>
-                      {record.patient?.fullName ||
-                        "Not available"}
-                    </strong>
-
-                    {record.patient?.email && (
-                      <p>
-                        {record.patient.email}
-                      </p>
-                    )}
-
-                    {record.patient?.phone && (
-                      <p>
-                        {record.patient.phone}
-                      </p>
-                    )}
-
-                  </div>
-
-                  <div className="record-section">
-
-                    <span>Doctor</span>
-
-                    <strong>
-                      {record.doctor?.fullName ||
-                        "Not available"}
-                    </strong>
-
-                    {record.doctor?.email && (
-                      <p>
-                        {record.doctor.email}
-                      </p>
-                    )}
-
-                  </div>
-
-                  {/* SYMPTOMS */}
-                  <div className="record-section">
-
-                    <span>Symptoms</span>
-
-                    <p>
-                      {record.symptoms ||
-                        "Not provided"}
-                    </p>
-
-                  </div>
-
-                  {/* TREATMENT */}
-                  <div className="record-section">
-
-                    <span>Treatment</span>
-
-                    <p>
-                      {record.treatment ||
-                        "Not provided"}
-                    </p>
-
-                  </div>
-
-                  {/* NOTES */}
-                  {record.notes && (
-                    <div className="record-section">
-
-                      <span>
-                        Doctor's Notes
-                      </span>
-
-                      <p>
-                        {record.notes}
-                      </p>
-
-                    </div>
-                  )}
-
-                  {/* DOCUMENTS */}
-                  {record.documents &&
-                    record.documents.length > 0 && (
-                      <div className="record-section">
-
-                        <span>
-                          Documents
+              <div className="medical-records-grid">
+                {records.map((record) => (
+                  <article
+                    className="medical-record-card"
+                    key={record._id}
+                  >
+                    {/* RECORD HEADER */}
+                    <div className="medical-record-header">
+                      <div className="medical-record-title">
+                        <span className="medical-record-label">
+                          MEDICAL RECORD
                         </span>
 
-                        <div>
+                        <h2>
+                          {record.diagnosis ||
+                            "Diagnosis unavailable"}
+                        </h2>
 
-                          {record.documents.map(
-                            (document, index) => (
-                              <p key={index}>
-                                📄{" "}
-                                {document.fileName}
-                              </p>
-                            )
+                        <p>
+                          Created on{" "}
+                          {formatDate(
+                            record.createdAt
                           )}
-
-                        </div>
-
+                        </p>
                       </div>
-                    )}
+                    </div>
 
-                  {/* VIEW DETAILS */}
-                  <div className="quick-actions">
+                    {/* PEOPLE */}
+                    <div className="medical-record-people">
+                      <div className="record-person">
+                        <span>Patient</span>
 
-                    <Link
-                      to={`/medical-records/${record._id}`}
-                    >
-                      View Full Record
-                    </Link>
+                        <strong>
+                          {record.patient?.fullName ||
+                            "Not available"}
+                        </strong>
 
-                  </div>
+                        {record.patient?.email && (
+                          <p>
+                            {record.patient.email}
+                          </p>
+                        )}
 
-                </article>
-              ))}
+                        {record.patient?.phone && (
+                          <p>
+                            {record.patient.phone}
+                          </p>
+                        )}
+                      </div>
 
+                      <div className="record-person">
+                        <span>Doctor</span>
+
+                        <strong>
+                          {record.doctor?.fullName ||
+                            "Not available"}
+                        </strong>
+
+                        {record.doctor?.email && (
+                          <p>
+                            {record.doctor.email}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* MEDICAL INFORMATION */}
+                    <div className="medical-record-information">
+                      <div className="record-section">
+                        <span>Symptoms</span>
+
+                        <p>
+                          {record.symptoms ||
+                            "Not provided"}
+                        </p>
+                      </div>
+
+                      <div className="record-section">
+                        <span>Treatment</span>
+
+                        <p>
+                          {record.treatment ||
+                            "Not provided"}
+                        </p>
+                      </div>
+
+                      {record.notes && (
+                        <div className="record-section">
+                          <span>
+                            Doctor's Notes
+                          </span>
+
+                          <p>{record.notes}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* DOCUMENTS */}
+                    {record.documents &&
+                      record.documents.length > 0 && (
+                        <div className="record-documents">
+                          <span>Documents</span>
+
+                          <div className="document-list">
+                            {record.documents.map(
+                              (
+                                document,
+                                index
+                              ) => (
+                                <div
+                                  className="document-item"
+                                  key={index}
+                                >
+                                  <span className="document-icon">
+                                    📄
+                                  </span>
+
+                                  <span>
+                                    {
+                                      document.fileName
+                                    }
+                                  </span>
+                                </div>
+                              )
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                    {/* ACTION */}
+                    <div className="medical-record-action">
+                      <Link
+                        to={`/medical-records/${record._id}`}
+                        className="medical-record-view-button"
+                      >
+                        View Full Record
+                        <span>→</span>
+                      </Link>
+                    </div>
+                  </article>
+                ))}
+              </div>
             </section>
           )}
-
       </main>
-
     </div>
   );
 }
