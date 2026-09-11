@@ -10,33 +10,21 @@ function Appointments() {
   const [doctors, setDoctors] = useState([]);
 
   const [formData, setFormData] = useState({
-    doctor: "",
+    doctorId: "",
     appointmentDate: "",
     reason: "",
   });
 
   const [loading, setLoading] = useState(true);
+  const [doctorsLoading, setDoctorsLoading] = useState(false);
   const [booking, setBooking] = useState(false);
   const [updating, setUpdating] = useState(false);
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [doctorsError, setDoctorsError] = useState("");
 
   // ==========================================
-  // LOAD APPOINTMENTS
-  // ==========================================
-
-  useEffect(() => {
-    fetchAppointments();
-
-    if (user?.role === "patient") {
-      fetchDoctors();
-    }
-  }, [user]);
-
-  // ==========================================
-  // GET APPOINTMENTS
+  // FETCH APPOINTMENTS
   // ==========================================
 
   const fetchAppointments = async () => {
@@ -46,11 +34,9 @@ function Appointments() {
 
       const response = await api.get("/appointments");
 
-      setAppointments(
-        response.data.appointments || response.data
-      );
+      setAppointments(response.data);
     } catch (error) {
-      console.error("Appointments error:", error);
+      console.error("Fetch appointments error:", error);
 
       setError(
         error.response?.data?.message ||
@@ -62,98 +48,73 @@ function Appointments() {
   };
 
   // ==========================================
-  // GET DOCTORS
+  // FETCH DOCTORS
   // ==========================================
 
   const fetchDoctors = async () => {
     try {
-      setDoctorsError("");
+      setDoctorsLoading(true);
 
       const response = await api.get("/users/doctors");
 
-      setDoctors(
-        response.data.doctors || response.data
-      );
+      setDoctors(response.data);
     } catch (error) {
-      console.error("Doctors error:", error);
+      console.error("Fetch doctors error:", error);
 
-      setDoctorsError(
+      setError(
         error.response?.data?.message ||
           "Unable to load doctors."
       );
+    } finally {
+      setDoctorsLoading(false);
     }
   };
 
   // ==========================================
-  // FORM CHANGE
+  // INITIAL LOAD
   // ==========================================
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  useEffect(() => {
+    fetchAppointments();
+
+    if (user?.role === "patient") {
+      fetchDoctors();
+    }
+  }, [user?.role]);
+
+  // ==========================================
+  // FORM HANDLING
+  // ==========================================
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
   };
 
   // ==========================================
   // BOOK APPOINTMENT
-  // PATIENT ONLY
   // ==========================================
 
-  const handleBookAppointment = async (e) => {
-    e.preventDefault();
-
-    setError("");
-    setSuccess("");
-
-    if (
-      !formData.doctor ||
-      !formData.appointmentDate ||
-      !formData.reason
-    ) {
-      setError(
-        "Please fill in all appointment fields."
-      );
-      return;
-    }
-
-    const selectedDate = new Date(
-      formData.appointmentDate
-    );
-
-    if (selectedDate <= new Date()) {
-      setError(
-        "Please select a future date and time."
-      );
-      return;
-    }
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     try {
       setBooking(true);
+      setError("");
+      setSuccess("");
 
-      const appointmentData = {
-        doctorId: formData.doctor,
-        appointmentDate:
-          selectedDate.toISOString(),
-        reason: formData.reason,
-      };
-
-      console.log(
-        "Sending appointment data:",
-        appointmentData
-      );
-
-      await api.post(
-        "/appointments",
-        appointmentData
-      );
+      await api.post("/appointments", formData);
 
       setSuccess(
-        "Appointment booked successfully!"
+        "Appointment booked successfully."
       );
 
       setFormData({
-        doctor: "",
+        doctorId: "",
         appointmentDate: "",
         reason: "",
       });
@@ -161,18 +122,12 @@ function Appointments() {
       await fetchAppointments();
     } catch (error) {
       console.error(
-        "Booking error:",
+        "Book appointment error:",
         error
-      );
-
-      console.log(
-        "Backend response:",
-        error.response?.data
       );
 
       setError(
         error.response?.data?.message ||
-          error.response?.data?.errors?.[0]?.msg ||
           "Unable to book appointment."
       );
     } finally {
@@ -182,7 +137,6 @@ function Appointments() {
 
   // ==========================================
   // UPDATE APPOINTMENT STATUS
-  // DOCTOR / ADMIN
   // ==========================================
 
   const updateStatus = async (
@@ -208,7 +162,7 @@ function Appointments() {
       await fetchAppointments();
     } catch (error) {
       console.error(
-        "Status update error:",
+        "Update appointment status error:",
         error
       );
 
@@ -223,11 +177,11 @@ function Appointments() {
 
   // ==========================================
   // CANCEL APPOINTMENT
-  // DOCTOR / ADMIN
   // ==========================================
 
   const cancelAppointment = async (
-    appointmentId
+    appointmentId,
+    cancelReason
   ) => {
     try {
       setUpdating(true);
@@ -237,10 +191,7 @@ function Appointments() {
       await api.patch(
         `/appointments/${appointmentId}/cancel`,
         {
-          cancelReason:
-            user?.role === "admin"
-              ? "Cancelled by admin"
-              : "Cancelled by doctor",
+          cancelReason,
         }
       );
 
@@ -269,341 +220,32 @@ function Appointments() {
   // ==========================================
 
   const formatDate = (date) => {
+    if (!date) {
+      return "Not available";
+    }
+
     return new Date(date).toLocaleString(
-      "en-GH",
+      undefined,
       {
-        weekday: "short",
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
+        dateStyle: "medium",
+        timeStyle: "short",
       }
     );
   };
 
   // ==========================================
-  // ADMIN VIEW
+  // ADMIN / DOCTOR VIEW
   // ==========================================
 
-  if (user?.role === "admin") {
+  if (
+    user?.role === "doctor" ||
+    user?.role === "admin"
+  ) {
+    const isAdmin = user?.role === "admin";
+
     return (
       <div className="dashboard-page">
-
-        {/* HEADER */}
         <header className="dashboard-header">
-
-          <Link
-            to="/admin/dashboard"
-            className="dashboard-logo"
-          >
-            Health<span>Connect</span>
-          </Link>
-
-          <Link
-            to="/admin/dashboard"
-            className="back-button"
-          >
-            ← Admin Dashboard
-          </Link>
-
-        </header>
-
-        <main className="dashboard-content">
-
-          {/* INTRO */}
-          <section className="dashboard-welcome">
-
-            <p className="eyebrow">
-              ADMIN PORTAL
-            </p>
-
-            <h1>
-              Manage Appointments
-            </h1>
-
-            <p>
-              View and manage all appointments
-              across HealthConnect.
-            </p>
-
-          </section>
-
-          {/* MESSAGES */}
-
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="success-message">
-              {success}
-            </div>
-          )}
-
-          {loading && (
-            <div className="dashboard-message">
-              Loading appointments...
-            </div>
-          )}
-
-          {/* EMPTY */}
-
-          {!loading &&
-            appointments.length === 0 && (
-              <div className="empty-state">
-
-                <h3>
-                  No appointments yet
-                </h3>
-
-                <p>
-                  There are currently no
-                  appointments in HealthConnect.
-                </p>
-
-              </div>
-            )}
-
-          {/* APPOINTMENTS */}
-
-          {!loading &&
-            appointments.length > 0 && (
-              <section className="appointments-section">
-
-                <h2>
-                  All Appointments ({appointments.length})
-                </h2>
-
-                <div className="appointments-list">
-
-                  {appointments.map(
-                    (appointment) => (
-                      <div
-                        className="appointment-card"
-                        key={appointment._id}
-                      >
-
-                        {/* HEADER */}
-
-                        <div className="appointment-main">
-
-                          <div>
-
-                            <span className="appointment-label">
-                              Appointment
-                            </span>
-
-                            <h2>
-                              {appointment.patient
-                                ?.fullName ||
-                                "Patient"}
-                            </h2>
-
-                            <p>
-                              Patient
-                            </p>
-
-                            {appointment.patient
-                              ?.email && (
-                              <p>
-                                {
-                                  appointment.patient
-                                    .email
-                                }
-                              </p>
-                            )}
-
-                          </div>
-
-                          <span
-                            className={`status-badge status-${appointment.status}`}
-                          >
-                            {appointment.status}
-                          </span>
-
-                        </div>
-
-                        {/* PATIENT / DOCTOR */}
-
-                        <div className="appointment-details">
-
-                          <div>
-                            <span>
-                              Patient
-                            </span>
-
-                            <strong>
-                              {appointment.patient
-                                ?.fullName ||
-                                "Not available"}
-                            </strong>
-                          </div>
-
-                          <div>
-                            <span>
-                              Doctor
-                            </span>
-
-                            <strong>
-                              {appointment.doctor
-                                ?.fullName ||
-                                "Not available"}
-                            </strong>
-                          </div>
-
-                          <div>
-                            <span>
-                              Date & Time
-                            </span>
-
-                            <strong>
-                              {formatDate(
-                                appointment.appointmentDate
-                              )}
-                            </strong>
-                          </div>
-
-                        </div>
-
-                        {/* CONTACT INFORMATION */}
-
-                        <div className="appointment-details">
-
-                          <div>
-                            <span>
-                              Patient Email
-                            </span>
-
-                            <strong>
-                              {appointment.patient
-                                ?.email ||
-                                "Not provided"}
-                            </strong>
-                          </div>
-
-                          <div>
-                            <span>
-                              Patient Phone
-                            </span>
-
-                            <strong>
-                              {appointment.patient
-                                ?.phone ||
-                                "Not provided"}
-                            </strong>
-                          </div>
-
-                          <div>
-                            <span>
-                              Doctor Email
-                            </span>
-
-                            <strong>
-                              {appointment.doctor
-                                ?.email ||
-                                "Not provided"}
-                            </strong>
-                          </div>
-
-                        </div>
-
-                        {/* REASON */}
-
-                        <div className="appointment-details">
-
-                          <div>
-                            <span>
-                              Reason
-                            </span>
-
-                            <strong>
-                              {appointment.reason ||
-                                "Not provided"}
-                            </strong>
-                          </div>
-
-                        </div>
-
-                        {/* ADMIN ACTIONS */}
-
-                        <div className="quick-actions">
-
-                          {appointment.status ===
-                            "pending" && (
-                            <button
-                              onClick={() =>
-                                updateStatus(
-                                  appointment._id,
-                                  "confirmed"
-                                )
-                              }
-                              disabled={updating}
-                            >
-                              Confirm
-                            </button>
-                          )}
-
-                          {appointment.status ===
-                            "confirmed" && (
-                            <button
-                              onClick={() =>
-                                updateStatus(
-                                  appointment._id,
-                                  "completed"
-                                )
-                              }
-                              disabled={updating}
-                            >
-                              Mark Completed
-                            </button>
-                          )}
-
-                          {appointment.status !==
-                            "cancelled" &&
-                            appointment.status !==
-                              "completed" && (
-                              <button
-                                onClick={() =>
-                                  cancelAppointment(
-                                    appointment._id
-                                  )
-                                }
-                                disabled={updating}
-                              >
-                                Cancel
-                              </button>
-                            )}
-
-                        </div>
-
-                      </div>
-                    )
-                  )}
-
-                </div>
-
-              </section>
-            )}
-
-        </main>
-
-      </div>
-    );
-  }
-
-  // ==========================================
-  // DOCTOR VIEW
-  // ==========================================
-
-  if (user?.role === "doctor") {
-    return (
-      <div className="dashboard-page">
-
-        <header className="dashboard-header">
-
           <Link
             to="/dashboard"
             className="dashboard-logo"
@@ -611,32 +253,49 @@ function Appointments() {
             Health<span>Connect</span>
           </Link>
 
-          <Link
-            to="/dashboard"
-            className="back-button"
-          >
-            ← Dashboard
-          </Link>
+          <div className="dashboard-user">
+            <div className="dashboard-user-info">
+              <strong>
+                {user?.fullName || "User"}
+              </strong>
 
+              <span>
+                {isAdmin ? "Admin" : "Doctor"}
+              </span>
+            </div>
+
+            <Link
+              to={
+                isAdmin
+                  ? "/admin/profile"
+                  : "/doctor/profile"
+              }
+              className="back-button"
+            >
+              Profile
+            </Link>
+          </div>
         </header>
 
         <main className="dashboard-content">
-
           <section className="dashboard-welcome">
-
-            <p className="eyebrow">
-              HEALTHCARE
-            </p>
+            <span className="eyebrow">
+              {isAdmin
+                ? "ADMIN APPOINTMENTS"
+                : "DOCTOR APPOINTMENTS"}
+            </span>
 
             <h1>
-              Patient Appointments
+              {isAdmin
+                ? "Manage Appointments"
+                : "Your Appointments"}
             </h1>
 
             <p>
-              View and manage appointments booked
-              with you.
+              {isAdmin
+                ? "Review and manage appointments across HealthConnect."
+                : "Review your appointments and manage their status."}
             </p>
-
           </section>
 
           {error && (
@@ -660,40 +319,36 @@ function Appointments() {
           {!loading &&
             appointments.length === 0 && (
               <div className="empty-state">
-
                 <h3>
                   No appointments yet
                 </h3>
 
                 <p>
-                  Patients who book appointments
-                  with you will appear here.
+                  {isAdmin
+                    ? "Appointments will appear here when patients book with doctors."
+                    : "Patients who book appointments with you will appear here."}
                 </p>
-
               </div>
             )}
 
           {!loading &&
             appointments.length > 0 && (
               <section className="appointments-section">
-
                 <h2>
-                  Your Appointments
+                  {isAdmin
+                    ? "All Appointments"
+                    : "Your Appointments"}
                 </h2>
 
                 <div className="appointments-list">
-
                   {appointments.map(
                     (appointment) => (
                       <div
                         className="appointment-card"
                         key={appointment._id}
                       >
-
                         <div className="appointment-main">
-
                           <div>
-
                             <span className="appointment-label">
                               Patient
                             </span>
@@ -725,7 +380,6 @@ function Appointments() {
                                 }
                               </p>
                             )}
-
                           </div>
 
                           <span
@@ -733,11 +387,9 @@ function Appointments() {
                           >
                             {appointment.status}
                           </span>
-
                         </div>
 
                         <div className="appointment-details">
-
                           <div>
                             <span>
                               Date & Time
@@ -756,21 +408,17 @@ function Appointments() {
                             </span>
 
                             <strong>
-                              {
-                                appointment.reason
-                              }
+                              {appointment.reason ||
+                                "Not provided"}
                             </strong>
                           </div>
-
                         </div>
 
-                        {/* Doctor Actions */}
-
                         <div className="quick-actions">
-
                           {appointment.status ===
                             "pending" && (
                             <button
+                              type="button"
                               onClick={() =>
                                 updateStatus(
                                   appointment._id,
@@ -779,13 +427,16 @@ function Appointments() {
                               }
                               disabled={updating}
                             >
-                              Confirm
+                              {updating
+                                ? "Updating..."
+                                : "Confirm"}
                             </button>
                           )}
 
                           {appointment.status ===
                             "confirmed" && (
                             <button
+                              type="button"
                               onClick={() =>
                                 updateStatus(
                                   appointment._id,
@@ -794,7 +445,9 @@ function Appointments() {
                               }
                               disabled={updating}
                             >
-                              Mark Completed
+                              {updating
+                                ? "Updating..."
+                                : "Mark Completed"}
                             </button>
                           )}
 
@@ -803,30 +456,37 @@ function Appointments() {
                             appointment.status !==
                               "completed" && (
                               <button
-                                onClick={() =>
-                                  cancelAppointment(
-                                    appointment._id
-                                  )
-                                }
+                                type="button"
+                                onClick={() => {
+                                  const confirmed =
+                                    window.confirm(
+                                      "Are you sure you want to cancel this appointment?"
+                                    );
+
+                                  if (confirmed) {
+                                    cancelAppointment(
+                                      appointment._id,
+                                      isAdmin
+                                        ? "Cancelled by admin"
+                                        : "Cancelled by doctor"
+                                    );
+                                  }
+                                }}
                                 disabled={updating}
                               >
-                                Cancel
+                                {updating
+                                  ? "Cancelling..."
+                                  : "Cancel"}
                               </button>
                             )}
-
                         </div>
-
                       </div>
                     )
                   )}
-
                 </div>
-
               </section>
             )}
-
         </main>
-
       </div>
     );
   }
@@ -837,9 +497,7 @@ function Appointments() {
 
   return (
     <div className="dashboard-page">
-
       <header className="dashboard-header">
-
         <Link
           to="/dashboard"
           className="dashboard-logo"
@@ -847,112 +505,101 @@ function Appointments() {
           Health<span>Connect</span>
         </Link>
 
-        <Link
-          to="/dashboard"
-          className="back-button"
-        >
-          ← Dashboard
-        </Link>
+        <div className="dashboard-user">
+          <div className="dashboard-user-info">
+            <strong>
+              {user?.fullName || "Patient"}
+            </strong>
 
+            <span>Patient</span>
+          </div>
+
+          <Link
+            to="/profile"
+            className="back-button"
+          >
+            Profile
+          </Link>
+        </div>
       </header>
 
       <main className="dashboard-content">
-
         <section className="dashboard-welcome">
+          <span className="eyebrow">
+            PATIENT APPOINTMENTS
+          </span>
 
-          <p className="eyebrow">
-            HEALTHCARE
-          </p>
-
-          <h1>
-            My Appointments
-          </h1>
+          <h1>Appointments</h1>
 
           <p>
-            Book and manage your healthcare
-            appointments.
+            Book an appointment with a doctor
+            and manage your upcoming visits.
           </p>
-
         </section>
+
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="success-message">
+            {success}
+          </div>
+        )}
 
         {/* ======================================
             BOOK APPOINTMENT
         ====================================== */}
 
         <section className="booking-section">
+          <span className="eyebrow">
+            NEW APPOINTMENT
+          </span>
 
-          <h2>
-            Book an Appointment
-          </h2>
+          <h2>Book an Appointment</h2>
 
           <form
-            onSubmit={
-              handleBookAppointment
-            }
+            onSubmit={handleSubmit}
             className="booking-form"
           >
-
-            {error && (
-              <div className="error-message">
-                {error}
-              </div>
-            )}
-
-            {success && (
-              <div className="success-message">
-                {success}
-              </div>
-            )}
-
-            {doctorsError && (
-              <div className="error-message">
-                {doctorsError}
-              </div>
-            )}
-
             <div className="form-group">
-
-              <label htmlFor="doctor">
-                Select Doctor
+              <label htmlFor="doctorId">
+                Doctor
               </label>
 
               <select
-                id="doctor"
-                name="doctor"
-                value={formData.doctor}
+                id="doctorId"
+                name="doctorId"
+                value={formData.doctorId}
                 onChange={handleChange}
                 disabled={
-                  doctors.length === 0
+                  doctorsLoading || booking
                 }
+                required
               >
-
                 <option value="">
-                  {doctors.length === 0
-                    ? "No doctors available"
+                  {doctorsLoading
+                    ? "Loading doctors..."
                     : "Select a doctor"}
                 </option>
 
-                {doctors.map(
-                  (doctor) => (
-                    <option
-                      key={doctor._id}
-                      value={doctor._id}
-                    >
-                      {doctor.fullName}
-
-                      {doctor.specialization
-                        ? ` - ${doctor.specialization}`
-                        : ""}
-                    </option>
-                  )
-                )}
-
+                {doctors.map((doctor) => (
+                  <option
+                    key={doctor._id}
+                    value={doctor._id}
+                  >
+                    {doctor.fullName}
+                    {doctor.specialization
+                      ? ` - ${doctor.specialization}`
+                      : ""}
+                  </option>
+                ))}
               </select>
-
             </div>
 
             <div className="form-group">
-
               <label htmlFor="appointmentDate">
                 Date and Time
               </label>
@@ -968,12 +615,12 @@ function Appointments() {
                 min={new Date()
                   .toISOString()
                   .slice(0, 16)}
+                disabled={booking}
+                required
               />
-
             </div>
 
             <div className="form-group">
-
               <label htmlFor="reason">
                 Reason for Appointment
               </label>
@@ -983,12 +630,11 @@ function Appointments() {
                 name="reason"
                 rows="4"
                 placeholder="Briefly describe why you need an appointment..."
-                value={
-                  formData.reason
-                }
+                value={formData.reason}
                 onChange={handleChange}
+                disabled={booking}
+                required
               />
-
             </div>
 
             <button
@@ -996,6 +642,7 @@ function Appointments() {
               className="auth-button"
               disabled={
                 booking ||
+                doctorsLoading ||
                 doctors.length === 0
               }
             >
@@ -1003,9 +650,7 @@ function Appointments() {
                 ? "Booking..."
                 : "Book Appointment"}
             </button>
-
           </form>
-
         </section>
 
         {/* ======================================
@@ -1013,10 +658,11 @@ function Appointments() {
         ====================================== */}
 
         <section className="appointments-section">
+          <span className="eyebrow">
+            APPOINTMENT HISTORY
+          </span>
 
-          <h2>
-            My Appointments
-          </h2>
+          <h2>My Appointments</h2>
 
           {loading && (
             <div className="dashboard-message">
@@ -1027,7 +673,6 @@ function Appointments() {
           {!loading &&
             appointments.length === 0 && (
               <div className="empty-state">
-
                 <h3>
                   No appointments yet
                 </h3>
@@ -1036,25 +681,20 @@ function Appointments() {
                   Your booked appointments
                   will appear here.
                 </p>
-
               </div>
             )}
 
           {!loading &&
             appointments.length > 0 && (
               <div className="appointments-list">
-
                 {appointments.map(
                   (appointment) => (
                     <div
                       className="appointment-card"
                       key={appointment._id}
                     >
-
                       <div className="appointment-main">
-
                         <div>
-
                           <span className="appointment-label">
                             Appointment
                           </span>
@@ -1076,6 +716,16 @@ function Appointments() {
                             </p>
                           )}
 
+                          {appointment.doctor
+                            ?.specialization && (
+                            <p>
+                              {
+                                appointment
+                                  .doctor
+                                  .specialization
+                              }
+                            </p>
+                          )}
                         </div>
 
                         <span
@@ -1083,13 +733,10 @@ function Appointments() {
                         >
                           {appointment.status}
                         </span>
-
                       </div>
 
                       <div className="appointment-details">
-
                         <div>
-
                           <span>
                             Date & Time
                           </span>
@@ -1099,12 +746,10 @@ function Appointments() {
                               appointment.appointmentDate
                             )}
                           </strong>
-
                         </div>
 
                         {appointment.reason && (
                           <div>
-
                             <span>
                               Reason
                             </span>
@@ -1114,26 +759,50 @@ function Appointments() {
                                 appointment.reason
                               }
                             </strong>
-
                           </div>
                         )}
-
                       </div>
 
+                      {/* PATIENT ACTIONS */}
+
+                      {appointment.status !==
+                        "cancelled" &&
+                        appointment.status !==
+                          "completed" && (
+                          <div className="appointment-actions">
+                            <button
+                              type="button"
+                              className="appointment-cancel-button"
+                              onClick={() => {
+                                const confirmed =
+                                  window.confirm(
+                                    "Are you sure you want to cancel this appointment?"
+                                  );
+
+                                if (confirmed) {
+                                  cancelAppointment(
+                                    appointment._id,
+                                    "Cancelled by patient"
+                                  );
+                                }
+                              }}
+                              disabled={updating}
+                            >
+                              {updating
+                                ? "Cancelling..."
+                                : "Cancel Appointment"}
+                            </button>
+                          </div>
+                        )}
                     </div>
                   )
                 )}
-
               </div>
             )}
-
         </section>
-
       </main>
-
     </div>
   );
 }
 
 export default Appointments;
-
