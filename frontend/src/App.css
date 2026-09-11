@@ -2016,3 +2016,353 @@ a {
     justify-content: center;
   }
 }
+/* ==========================================
+   DOCTOR MEDICAL RECORDS
+========================================== */
+
+.doctor-record-create {
+  margin-bottom: 55px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e8ebf0;
+  border-radius: 16px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.025);
+}
+
+.doctor-record-create-header {
+  padding: 30px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 25px;
+  border-bottom: 1px solid #eef0f3;
+}
+
+.doctor-record-create-header .eyebrow {
+  margin-bottom: 8px;
+}
+
+.doctor-record-create-header h2 {
+  margin: 0 0 9px;
+  color: #172033;
+  font-size: 23px;
+}
+
+.doctor-record-create-header p {
+  margin: 0;
+  color: #667085;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.doctor-record-step {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #e0f7ef;
+  color: #168f72;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.doctor-record-create > .error-message,
+.doctor-record-create > .success-message {
+  margin: 20px 30px 0;
+}
+
+.doctor-record-form {
+  padding: 28px 30px 30px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 21px;
+}
+
+.doctor-record-form textarea {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #d9dee8;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #172033;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.doctor-record-form textarea::placeholder {
+  color: #98a2b3;
+}
+
+.doctor-record-form textarea:focus {
+  border-color: #168f72;
+  box-shadow: 0 0 0 3px rgba(22, 143, 114, 0.1);
+}
+
+.doctor-record-form select,
+.doctor-record-form input[type="text"] {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #d9dee8;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #172033;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.doctor-record-form select:focus,
+.doctor-record-form input[type="text"]:focus {
+  border-color: #168f72;
+  box-shadow: 0 0 0 3px rgba(22, 143, 114, 0.1);
+}
+
+.doctor-record-form select:disabled,
+.doctor-record-form input:disabled,
+.doctor-record-form textarea:disabled {
+  background: #f5f7fb;
+  cursor: not-allowed;
+}
+
+.doctor-record-form input[type="file"] {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px dashed #cfd6df;
+  border-radius: 9px;
+  background: #f8fafb;
+  color: #344054;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.doctor-record-form input[type="file"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.form-help {
+  display: block;
+  margin-top: 7px;
+  color: #98a2b3;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.doctor-record-full-width {
+  grid-column: 1 / -1;
+}
+
+.selected-documents {
+  margin-top: 10px;
+  padding: 11px 13px;
+  border: 1px solid #e8ebf0;
+  border-radius: 8px;
+  background: #f8fafb;
+}
+
+.selected-documents > span {
+  display: block;
+  margin-bottom: 7px;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.selected-documents p {
+  margin: 4px 0;
+  color: #667085;
+  font-size: 12px;
+  word-break: break-word;
+}
+
+.doctor-record-form-action {
+  grid-column: 1 / -1;
+  padding-top: 4px;
+}
+
+.doctor-record-form-action .auth-button {
+  max-width: 250px;
+}
+
+.doctor-existing-records {
+  margin-top: 20px;
+}
+
+.doctor-record-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.doctor-record-card {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e8ebf0;
+  border-radius: 15px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.025);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.doctor-record-card:hover {
+  transform: translateY(-2px);
+  border-color: #cfe9e1;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+}
+
+.doctor-record-card-header {
+  padding: 24px 27px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid #eef0f3;
+}
+
+.doctor-record-card-header h3 {
+  margin: 0 0 5px;
+  color: #172033;
+  font-size: 19px;
+}
+
+.doctor-record-card-header p {
+  margin: 0;
+  color: #667085;
+  font-size: 12px;
+}
+
+.doctor-record-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: #eef0f3;
+}
+
+.doctor-record-summary > div {
+  min-width: 0;
+  padding: 20px 22px;
+  background: #ffffff;
+}
+
+.doctor-record-summary span {
+  display: block;
+  margin-bottom: 7px;
+  color: #667085;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.doctor-record-summary strong {
+  display: block;
+  color: #344054;
+  font-size: 13px;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.doctor-record-notes {
+  padding: 20px 27px;
+  border-top: 1px solid #eef0f3;
+}
+
+.doctor-record-notes > span {
+  display: block;
+  margin-bottom: 7px;
+  color: #667085;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.doctor-record-notes p {
+  margin: 0;
+  color: #344054;
+  font-size: 13px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.doctor-record-card-footer {
+  padding: 17px 27px;
+  display: flex;
+  justify-content: flex-end;
+  background: #fcfdfd;
+  border-top: 1px solid #eef0f3;
+}
+
+@media (max-width: 850px) {
+  .doctor-record-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .doctor-record-create-header {
+    padding: 23px 20px;
+  }
+
+  .doctor-record-form {
+    grid-template-columns: 1fr;
+    padding: 23px 20px;
+  }
+
+  .doctor-record-full-width {
+    grid-column: auto;
+  }
+
+  .doctor-record-form-action {
+    grid-column: auto;
+  }
+
+  .doctor-record-form-action .auth-button {
+    max-width: none;
+  }
+
+  .doctor-record-create > .error-message,
+  .doctor-record-create > .success-message {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+
+  .doctor-record-card-header {
+    padding: 20px;
+    flex-direction: column;
+  }
+
+  .doctor-record-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .doctor-record-summary > div {
+    padding: 17px 20px;
+  }
+
+  .doctor-record-notes {
+    padding: 18px 20px;
+  }
+
+  .doctor-record-card-footer {
+    padding: 16px 20px;
+  }
+
+  .doctor-record-card-footer
+    .medical-record-view-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
