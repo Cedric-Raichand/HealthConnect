@@ -23,7 +23,6 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setError("");
 
     if (!formData.email || !formData.password) {
@@ -60,15 +59,20 @@ function Login() {
             Health<span>Connect</span>
           </Link>
 
-          <h1>Welcome back</h1>
-
-          <p>
-            Sign in to access your HealthConnect account.
-          </p>
+          <div className="auth-heading">
+            <h1>Welcome back</h1>
+            <p>
+              Sign in to access your HealthConnect account.
+            </p>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
-          {error && <div className="error-message">{error}</div>}
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
 
           <div className="form-group">
             <label htmlFor="email">Email address</label>
@@ -80,6 +84,7 @@ function Login() {
               placeholder="you@example.com"
               value={formData.email}
               onChange={handleChange}
+              autoComplete="email"
             />
           </div>
 
@@ -93,6 +98,7 @@ function Login() {
               placeholder="Enter your password"
               value={formData.password}
               onChange={handleChange}
+              autoComplete="current-password"
             />
           </div>
 
