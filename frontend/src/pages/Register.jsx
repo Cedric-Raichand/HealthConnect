@@ -25,7 +25,6 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setError("");
 
     if (
@@ -72,15 +71,21 @@ function Register() {
             Health<span>Connect</span>
           </Link>
 
-          <h1>Create your account</h1>
+          <div className="auth-heading">
+            <h1>Create your account</h1>
 
-          <p>
-            Join HealthConnect and manage your healthcare in one place.
-          </p>
+            <p>
+              Join HealthConnect and manage your healthcare in one place.
+            </p>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
-          {error && <div className="error-message">{error}</div>}
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
 
           <div className="form-group">
             <label htmlFor="fullName">Full name</label>
@@ -92,6 +97,7 @@ function Register() {
               placeholder="Your full name"
               value={formData.fullName}
               onChange={handleChange}
+              autoComplete="name"
             />
           </div>
 
@@ -105,6 +111,7 @@ function Register() {
               placeholder="you@example.com"
               value={formData.email}
               onChange={handleChange}
+              autoComplete="email"
             />
           </div>
 
@@ -118,6 +125,7 @@ function Register() {
               placeholder="0240000000"
               value={formData.phone}
               onChange={handleChange}
+              autoComplete="tel"
             />
           </div>
 
@@ -131,6 +139,7 @@ function Register() {
               placeholder="At least 6 characters"
               value={formData.password}
               onChange={handleChange}
+              autoComplete="new-password"
             />
           </div>
 
