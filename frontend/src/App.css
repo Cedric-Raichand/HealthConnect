@@ -1795,3 +1795,224 @@ a {
     justify-content: center;
   }
 }
+/* ==========================================
+   MEDICAL RECORD DETAILS
+========================================== */
+
+.medical-record-details-loading {
+  flex-direction: column;
+}
+
+.medical-record-details-error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.medical-record-detail-container {
+  margin-top: 20px;
+}
+
+.medical-record-detail-card {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e8ebf0;
+  border-radius: 16px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.025);
+}
+
+.medical-record-detail-header {
+  padding: 30px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 30px;
+  border-bottom: 1px solid #eef0f3;
+}
+
+.medical-record-detail-header h2 {
+  margin: 0 0 8px;
+  color: #172033;
+  font-size: 25px;
+  line-height: 1.3;
+  font-weight: 750;
+}
+
+.medical-record-detail-header p {
+  margin: 0;
+  color: #667085;
+  font-size: 13px;
+}
+
+.medical-record-detail-date {
+  min-width: 150px;
+  padding: 13px 15px;
+  border: 1px solid #e8ebf0;
+  border-radius: 10px;
+  background: #f8fafb;
+}
+
+.medical-record-detail-date span {
+  display: block;
+  margin-bottom: 6px;
+  color: #667085;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.medical-record-detail-date strong {
+  color: #172033;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.medical-record-detail-people {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: #eef0f3;
+  border-bottom: 1px solid #eef0f3;
+}
+
+.medical-record-detail-people .record-person {
+  min-height: 130px;
+}
+
+.medical-record-detail-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-information-section {
+  padding: 27px 30px;
+  border-bottom: 1px solid #eef0f3;
+}
+
+.detail-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 13px;
+}
+
+.detail-section-heading > span {
+  color: #168f72;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.detail-section-heading h3 {
+  margin: 0;
+  color: #172033;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.detail-information-section > p {
+  max-width: 900px;
+  margin: 0;
+  color: #344054;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.medical-record-detail-documents {
+  padding: 27px 30px;
+  border-bottom: 1px solid #eef0f3;
+}
+
+.medical-record-detail-documents
+  .detail-section-heading {
+  margin-bottom: 18px;
+}
+
+.detail-document-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.detail-document-item {
+  padding: 13px 15px;
+  border: 1px solid #e8ebf0;
+  border-radius: 9px;
+  background: #f8fafb;
+}
+
+.detail-document-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.detail-document-info strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #344054;
+  font-size: 13px;
+  word-break: break-word;
+}
+
+.detail-document-info p {
+  margin: 0;
+  color: #98a2b3;
+  font-size: 11px;
+}
+
+.document-icon {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #e0f7ef;
+  font-size: 15px;
+}
+
+.medical-record-detail-footer {
+  padding: 20px 30px;
+  display: flex;
+  justify-content: flex-start;
+  background: #fcfdfd;
+}
+
+@media (max-width: 700px) {
+  .medical-record-detail-header {
+    padding: 23px 20px;
+    flex-direction: column;
+  }
+
+  .medical-record-detail-header h2 {
+    font-size: 21px;
+  }
+
+  .medical-record-detail-date {
+    width: 100%;
+  }
+
+  .medical-record-detail-people {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-information-section,
+  .medical-record-detail-documents {
+    padding: 23px 20px;
+  }
+
+  .medical-record-detail-footer {
+    padding: 17px 20px;
+  }
+
+  .medical-record-detail-footer
+    .medical-record-view-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
