@@ -3865,3 +3865,109 @@ a {
     padding: 16px;
   }
 }
+/* =========================================
+   NOT FOUND PAGE
+========================================= */
+
+.not-found-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #f8fafc;
+}
+
+.not-found-card {
+  width: 100%;
+  max-width: 560px;
+  padding: 48px 36px;
+  text-align: center;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.07);
+}
+
+.not-found-icon {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 27px;
+  font-weight: 800;
+}
+
+.not-found-card h1 {
+  margin: 8px 0 12px;
+  font-size: 32px;
+  color: #111827;
+}
+
+.not-found-card > p:not(.eyebrow) {
+  max-width: 420px;
+  margin: 0 auto;
+  color: #6b7280;
+  line-height: 1.7;
+}
+
+.not-found-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.not-found-home-button,
+.not-found-login-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 18px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.not-found-home-button {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.not-found-home-button:hover {
+  background: #1d4ed8;
+}
+
+.not-found-login-button {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.not-found-login-button:hover {
+  background: #e5e7eb;
+}
+
+@media (max-width: 500px) {
+  .not-found-card {
+    padding: 36px 22px;
+  }
+
+  .not-found-card h1 {
+    font-size: 26px;
+  }
+
+  .not-found-actions {
+    flex-direction: column;
+  }
+
+  .not-found-home-button,
+  .not-found-login-button {
+    width: 100%;
+  }
+}
