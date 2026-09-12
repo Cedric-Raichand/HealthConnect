@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
@@ -9,7 +8,7 @@ function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [actionLoading, setActionLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -25,7 +24,6 @@ function AdminUsers() {
       setError("");
 
       const response = await api.get("/users");
-
       setUsers(response.data.users || []);
     } catch (error) {
       console.error("Users error:", error);
@@ -53,7 +51,7 @@ function AdminUsers() {
 
   const handleVerification = async (user) => {
     try {
-      setActionLoading(true);
+      setActionLoading(user._id);
       setError("");
 
       const response = await api.patch(
@@ -83,7 +81,7 @@ function AdminUsers() {
           "Unable to update verification status."
       );
     } finally {
-      setActionLoading(false);
+      setActionLoading(null);
     }
   };
 
@@ -101,15 +99,14 @@ function AdminUsers() {
     }
 
     try {
-      setActionLoading(true);
+      setActionLoading(user._id);
       setError("");
 
       await api.delete(`/users/${user._id}`);
 
       setUsers((currentUsers) =>
         currentUsers.filter(
-          (currentUser) =>
-            currentUser._id !== user._id
+          (currentUser) => currentUser._id !== user._id
         )
       );
     } catch (error) {
@@ -120,7 +117,7 @@ function AdminUsers() {
           "Unable to delete user."
       );
     } finally {
-      setActionLoading(false);
+      setActionLoading(null);
     }
   };
 
@@ -129,22 +126,36 @@ function AdminUsers() {
   // ==========================================
 
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString(
-      "en-GH",
-      {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }
-    );
+    if (!date) {
+      return "Unknown";
+    }
+
+    return new Date(date).toLocaleDateString("en-GH", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
   };
+
+  // ==========================================
+  // ROLE LABEL
+  // ==========================================
+
+  const getRoleLabel = (role) => {
+    if (!role) {
+      return "User";
+    }
+
+    return role.charAt(0).toUpperCase() + role.slice(1);
+  };
+
+  // ==========================================
+  // PAGE
+  // ==========================================
 
   return (
     <div className="dashboard-page">
-
-      {/* HEADER */}
       <header className="dashboard-header">
-
         <Link
           to="/admin/dashboard"
           className="dashboard-logo"
@@ -158,233 +169,238 @@ function AdminUsers() {
         >
           ← Admin Dashboard
         </Link>
-
       </header>
 
       <main className="dashboard-content">
+        <section className="admin-users-header">
+          <div>
+            <p className="eyebrow">ADMIN PORTAL</p>
 
-        {/* INTRO */}
-        <section className="dashboard-welcome">
+            <h1>User Management</h1>
 
-          <p className="eyebrow">
-            ADMIN PORTAL
-          </p>
+            <p>
+              View, verify and manage registered
+              patients, doctors and administrators.
+            </p>
+          </div>
 
-          <h1>
-            Manage Users
-          </h1>
-
-          <p>
-            View and manage registered patients,
-            doctors and administrators.
-          </p>
-
+          {!loading && !error && (
+            <div className="admin-users-count">
+              <strong>{users.length}</strong>
+              <span>Registered Users</span>
+            </div>
+          )}
         </section>
 
-        {/* ERROR */}
         {error && (
           <div className="error-message">
             {error}
           </div>
         )}
 
-        {/* LOADING */}
         {loading && (
-          <div className="dashboard-message">
-            Loading users...
+          <div className="admin-users-loading">
+            <div className="admin-users-loading-icon">
+              👥
+            </div>
+
+            <h2>Loading users...</h2>
+
+            <p>
+              Please wait while we retrieve the
+              registered users.
+            </p>
           </div>
         )}
 
-        {/* EMPTY */}
         {!loading &&
           !error &&
           users.length === 0 && (
-            <div className="empty-state">
+            <div className="empty-state admin-users-empty">
+              <div className="admin-users-empty-icon">
+                👥
+              </div>
 
-              <h2>
-                No users found
-              </h2>
+              <h2>No users found</h2>
 
               <p>
                 There are currently no registered
                 users.
               </p>
-
             </div>
           )}
 
-        {/* USERS */}
         {!loading &&
           users.length > 0 && (
-            <section className="appointments-section">
+            <section className="admin-users-section">
+              <div className="admin-users-section-header">
+                <div>
+                  <h2>Registered Users</h2>
 
-              <h2>
-                Registered Users ({users.length})
-              </h2>
+                  <p>
+                    Manage account verification and
+                    user access.
+                  </p>
+                </div>
 
-              <div className="appointments-list">
-
-                {users.map((user) => (
-                  <article
-                    className="appointment-card"
-                    key={user._id}
-                  >
-
-                    {/* USER HEADER */}
-                    <div className="appointment-main">
-
-                      <div>
-
-                        <span className="appointment-label">
-                          {user.role}
-                        </span>
-
-                        <h2>
-                          {user.fullName}
-                        </h2>
-
-                        <p>
-                          {user.email}
-                        </p>
-
-                      </div>
-
-                      <span
-                        className={`status-badge ${
-                          user.isVerified
-                            ? "status-confirmed"
-                            : "status-pending"
-                        }`}
-                      >
-                        {user.isVerified
-                          ? "Verified"
-                          : "Not Verified"}
-                      </span>
-
-                    </div>
-
-                    {/* USER DETAILS */}
-                    <div className="appointment-details">
-
-                      <div>
-                        <span>Role</span>
-
-                        <strong>
-                          {user.role}
-                        </strong>
-                      </div>
-
-                      <div>
-                        <span>Phone</span>
-
-                        <strong>
-                          {user.phone ||
-                            "Not provided"}
-                        </strong>
-                      </div>
-
-                      <div>
-                        <span>Joined</span>
-
-                        <strong>
-                          {formatDate(
-                            user.createdAt
-                          )}
-                        </strong>
-                      </div>
-
-                    </div>
-
-                    {/* DOCTOR INFORMATION */}
-                    {user.role === "doctor" && (
-                      <div className="appointment-details">
-
-                        <div>
-                          <span>
-                            Specialization
-                          </span>
-
-                          <strong>
-                            {user.specialization ||
-                              "Not provided"}
-                          </strong>
-                        </div>
-
-                        <div>
-                          <span>
-                            Hospital
-                          </span>
-
-                          <strong>
-                            {user.hospital ||
-                              "Not provided"}
-                          </strong>
-                        </div>
-
-                        <div>
-                          <span>
-                            Experience
-                          </span>
-
-                          <strong>
-                            {user.yearsOfExperience ||
-                              0}{" "}
-                            years
-                          </strong>
-                        </div>
-
-                      </div>
-                    )}
-
-                    {/* ACTIONS */}
-                    <div className="quick-actions">
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleViewUser(user._id)
-                        }
-                      >
-                        View Details
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleVerification(user)
-                        }
-                        disabled={actionLoading}
-                      >
-                        {user.isVerified
-                          ? "Unverify User"
-                          : "Verify User"}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleDeleteUser(user)
-                        }
-                        disabled={actionLoading}
-                      >
-                        Delete User
-                      </button>
-
-                    </div>
-
-                  </article>
-                ))}
-
+                <span className="admin-users-total">
+                  {users.length} total
+                </span>
               </div>
 
+              <div className="admin-users-grid">
+                {users.map((user) => {
+                  const isActionLoading =
+                    actionLoading === user._id;
+
+                  return (
+                    <article
+                      className="admin-user-card"
+                      key={user._id}
+                    >
+                      {/* CARD HEADER */}
+                      <div className="admin-user-card-header">
+                        <div className="admin-user-avatar">
+                          {user.fullName
+                            ?.charAt(0)
+                            .toUpperCase() || "U"}
+                        </div>
+
+                        <div className="admin-user-heading">
+                          <span
+                            className={`admin-role-badge role-${user.role}`}
+                          >
+                            {getRoleLabel(user.role)}
+                          </span>
+
+                          <h2>{user.fullName}</h2>
+
+                          <p>{user.email}</p>
+                        </div>
+                      </div>
+
+                      {/* VERIFICATION */}
+                      <div className="admin-user-verification">
+                        <span
+                          className={`status-badge ${
+                            user.isVerified
+                              ? "status-confirmed"
+                              : "status-pending"
+                          }`}
+                        >
+                          {user.isVerified
+                            ? "✓ Verified"
+                            : "Not Verified"}
+                        </span>
+                      </div>
+
+                      {/* BASIC DETAILS */}
+                      <div className="admin-user-details">
+                        <div>
+                          <span>Role</span>
+                          <strong>
+                            {getRoleLabel(user.role)}
+                          </strong>
+                        </div>
+
+                        <div>
+                          <span>Phone</span>
+                          <strong>
+                            {user.phone ||
+                              "Not provided"}
+                          </strong>
+                        </div>
+
+                        <div>
+                          <span>Joined</span>
+                          <strong>
+                            {formatDate(
+                              user.createdAt
+                            )}
+                          </strong>
+                        </div>
+                      </div>
+
+                      {/* DOCTOR INFORMATION */}
+                      {user.role === "doctor" && (
+                        <div className="admin-doctor-details">
+                          <div>
+                            <span>Specialization</span>
+                            <strong>
+                              {user.specialization ||
+                                "Not provided"}
+                            </strong>
+                          </div>
+
+                          <div>
+                            <span>Hospital</span>
+                            <strong>
+                              {user.hospital ||
+                                "Not provided"}
+                            </strong>
+                          </div>
+
+                          <div>
+                            <span>Experience</span>
+                            <strong>
+                              {user.yearsOfExperience ||
+                                0}{" "}
+                              years
+                            </strong>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* ACTIONS */}
+                      <div className="admin-user-actions">
+                        <button
+                          type="button"
+                          className="admin-user-view-button"
+                          onClick={() =>
+                            handleViewUser(user._id)
+                          }
+                          disabled={isActionLoading}
+                        >
+                          View Details
+                        </button>
+
+                        <button
+                          type="button"
+                          className="admin-user-verify-button"
+                          onClick={() =>
+                            handleVerification(user)
+                          }
+                          disabled={isActionLoading}
+                        >
+                          {isActionLoading
+                            ? "Processing..."
+                            : user.isVerified
+                            ? "Unverify"
+                            : "Verify User"}
+                        </button>
+
+                        <button
+                          type="button"
+                          className="admin-user-delete-button"
+                          onClick={() =>
+                            handleDeleteUser(user)
+                          }
+                          disabled={isActionLoading}
+                        >
+                          {isActionLoading
+                            ? "Processing..."
+                            : "Delete User"}
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
             </section>
           )}
-
       </main>
-
     </div>
   );
 }
 
 export default AdminUsers;
-
