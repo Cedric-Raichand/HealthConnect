@@ -3512,3 +3512,356 @@ a {
     padding: 18px;
   }
 }
+/* =========================================
+   ADMIN USER DETAILS
+========================================= */
+
+.admin-user-details-header {
+  margin-bottom: 28px;
+}
+
+.admin-user-details-header h1 {
+  margin: 6px 0 8px;
+}
+
+.admin-user-details-header p:not(.eyebrow) {
+  margin: 0;
+  color: #6b7280;
+}
+
+.admin-user-details-card {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 30px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+}
+
+/* PROFILE HEADER */
+
+.admin-user-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 28px;
+}
+
+.admin-user-profile-avatar {
+  width: 76px;
+  height: 76px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8f1ff;
+  color: #2563eb;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.admin-user-profile-heading {
+  min-width: 0;
+}
+
+.admin-user-profile-top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.admin-user-profile-heading h2 {
+  margin: 0 0 4px;
+  font-size: 26px;
+}
+
+.admin-user-profile-heading p {
+  margin: 0;
+  color: #6b7280;
+  word-break: break-word;
+}
+
+/* ROLE */
+
+.admin-role-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-role-patient {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.admin-role-doctor {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.admin-role-admin {
+  background: #f3e8ff;
+  color: #7e22ce;
+}
+
+.admin-user-verified,
+.admin-user-unverified {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-user-verified {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.admin-user-unverified {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+/* SECTIONS */
+
+.admin-user-details-section {
+  padding: 26px 0;
+}
+
+.admin-user-details-divider {
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.admin-user-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.admin-user-section-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: #f3f4f6;
+  font-size: 19px;
+}
+
+.admin-user-section-heading h3 {
+  margin: 0 0 3px;
+  font-size: 18px;
+}
+
+.admin-user-section-heading p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* INFO GRID */
+
+.admin-user-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-user-info-item {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.admin-user-info-item span,
+.admin-user-bio > span {
+  display: block;
+  margin-bottom: 6px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-user-info-item strong {
+  display: block;
+  color: #111827;
+  font-size: 14px;
+  word-break: break-word;
+}
+
+.admin-user-info-full {
+  grid-column: 1 / -1;
+}
+
+/* BIO */
+
+.admin-user-bio {
+  margin-top: 14px;
+  padding: 18px;
+  border-radius: 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+}
+
+.admin-user-bio p {
+  margin: 0;
+  color: #374151;
+  line-height: 1.7;
+}
+
+/* FOOTER */
+
+.admin-user-details-footer {
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 26px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.admin-user-footer-button,
+.admin-user-back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  padding: 11px 16px;
+  border-radius: 10px;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.admin-user-footer-button:hover,
+.admin-user-back-button:hover {
+  background: #e5e7eb;
+}
+
+/* LOADING */
+
+.admin-user-details-loading {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+}
+
+.loading-spinner {
+  width: 34px;
+  height: 34px;
+  margin-bottom: 12px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: admin-user-spin 0.8s linear infinite;
+}
+
+@keyframes admin-user-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ERROR */
+
+.admin-user-details-error {
+  max-width: 600px;
+  margin: 60px auto;
+  padding: 36px;
+  text-align: center;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+}
+
+.admin-user-error-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #fef2f2;
+  color: #dc2626;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.admin-user-details-error h2 {
+  margin: 0 0 8px;
+}
+
+.admin-user-details-error p {
+  margin: 0 0 20px;
+  color: #6b7280;
+}
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+  .admin-user-details-card {
+    padding: 20px;
+    border-radius: 14px;
+  }
+
+  .admin-user-profile-header {
+    align-items: flex-start;
+  }
+
+  .admin-user-profile-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 20px;
+  }
+
+  .admin-user-profile-heading h2 {
+    font-size: 21px;
+  }
+
+  .admin-user-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-user-info-full {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-user-profile-header {
+    flex-direction: column;
+  }
+
+  .admin-user-profile-heading {
+    width: 100%;
+  }
+
+  .admin-user-profile-top {
+    margin-bottom: 10px;
+  }
+
+  .admin-user-details-card {
+    padding: 16px;
+  }
+}
