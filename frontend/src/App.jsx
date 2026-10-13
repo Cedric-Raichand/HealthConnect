@@ -23,10 +23,12 @@ import AdminUserDetails from "./pages/AdminUserDetails";
 
 
 import MedicalRecordDetails from "./pages/MedicalRecordDetails";
+import ThemeToggle from "./components/ThemeToggle";
 
 function App() {
   return (
     <BrowserRouter>
+    <ThemeToggle />
       <Routes>
 
         {/* ============================= */}
