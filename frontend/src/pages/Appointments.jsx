@@ -34,7 +34,7 @@ function Appointments() {
 
       const response = await api.get("/appointments");
 
-      setAppointments(response.data);
+      setAppointments(response.data.appointments || []);
     } catch (error) {
       console.error("Fetch appointments error:", error);
 
@@ -57,7 +57,7 @@ function Appointments() {
 
       const response = await api.get("/users/doctors");
 
-      setDoctors(response.data);
+      setDoctors(response.data.doctors || []);
     } catch (error) {
       console.error("Fetch doctors error:", error);
 
