@@ -108,7 +108,8 @@ const getAppointments = async (req, res, next) => {
         patient: req.user._id,
       })
         .populate("doctor", "fullName email phone")
-        .sort({ appointmentDate: 1 });
+        .sort({ appointmentDate: 1 })
+        .lean();
 
 
     } else if (req.user.role === "doctor") {
@@ -117,7 +118,8 @@ const getAppointments = async (req, res, next) => {
         doctor: req.user._id,
       })
         .populate("patient", "fullName email phone")
-        .sort({ appointmentDate: 1 });
+        .sort({ appointmentDate: 1 })
+        .lean();
 
 
     } else if (req.user.role === "admin") {
@@ -125,7 +127,8 @@ const getAppointments = async (req, res, next) => {
       appointments = await Appointment.find()
         .populate("patient", "fullName email phone")
         .populate("doctor", "fullName email phone")
-        .sort({ appointmentDate: 1 });
+        .sort({ appointmentDate: 1 })
+        .lean();
 
     }
 
