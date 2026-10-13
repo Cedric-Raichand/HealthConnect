@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const protect = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
-const upload = require("../middleware/uploadmiddleware");
+const upload = require("../middleware/uploadMiddleware");
 const validate = require("../middleware/validate");
 const validateObjectId = require("../middleware/validateObjectId");
 
