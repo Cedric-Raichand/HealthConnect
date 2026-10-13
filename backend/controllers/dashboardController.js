@@ -3,39 +3,28 @@ const Appointment = require("../models/Appointment");
 const MedicalRecord = require("../models/MedicalRecord");
 const Prescription = require("../models/Prescription");
 
-
 // Get dashboard statistics
+// All counts for a role run in parallel (one round-trip of latency instead of 4-6 in a row).
 const getDashboard = async (req, res, next) => {
   try {
-
+    const { role, _id } = req.user;
     let dashboard = {};
 
-
-    // Patient dashboard
-    if (req.user.role === "patient") {
-
-      const appointments = await Appointment.countDocuments({
-        patient: req.user._id,
-      });
-
-
-      const upcomingAppointments = await Appointment.countDocuments({
-        patient: req.user._id,
-        status: {
-          $in: ["pending", "confirmed"],
-        },
-      });
-
-
-      const medicalRecords = await MedicalRecord.countDocuments({
-        patient: req.user._id,
-      });
-
-
-      const prescriptions = await Prescription.countDocuments({
-        patient: req.user._id,
-      });
-
+    if (role === "patient") {
+      const [
+        appointments,
+        upcomingAppointments,
+        medicalRecords,
+        prescriptions,
+      ] = await Promise.all([
+        Appointment.countDocuments({ patient: _id }),
+        Appointment.countDocuments({
+          patient: _id,
+          status: { $in: ["pending", "confirmed"] },
+        }),
+        MedicalRecord.countDocuments({ patient: _id }),
+        Prescription.countDocuments({ patient: _id }),
+      ]);
 
       dashboard = {
         appointments,
@@ -43,72 +32,41 @@ const getDashboard = async (req, res, next) => {
         medicalRecords,
         prescriptions,
       };
-
-    }
-
-
-    // Doctor dashboard
-    else if (req.user.role === "doctor") {
-
-      const appointments = await Appointment.countDocuments({
-        doctor: req.user._id,
-      });
-
-
-      const pendingAppointments = await Appointment.countDocuments({
-        doctor: req.user._id,
-        status: "pending",
-      });
-
-
-      const completedAppointments = await Appointment.countDocuments({
-        doctor: req.user._id,
-        status: "completed",
-      });
-
-
-      const patients = await Appointment.distinct(
-        "patient",
-        {
-          doctor: req.user._id,
-        }
-      );
-
+    } else if (role === "doctor") {
+      const [
+        totalAppointments,
+        pendingAppointments,
+        completedAppointments,
+        patients,
+      ] = await Promise.all([
+        Appointment.countDocuments({ doctor: _id }),
+        Appointment.countDocuments({ doctor: _id, status: "pending" }),
+        Appointment.countDocuments({ doctor: _id, status: "completed" }),
+        Appointment.distinct("patient", { doctor: _id }),
+      ]);
 
       dashboard = {
-        totalAppointments: appointments,
+        totalAppointments,
         totalPatients: patients.length,
         pendingAppointments,
         completedAppointments,
       };
-
-    }
-
-
-    // Admin dashboard
-    else if (req.user.role === "admin") {
-
-      const users = await User.countDocuments();
-
-
-      const doctors = await User.countDocuments({
-        role: "doctor",
-      });
-
-
-      const patients = await User.countDocuments({
-        role: "patient",
-      });
-
-
-      const appointments = await Appointment.countDocuments();
-
-
-      const records = await MedicalRecord.countDocuments();
-
-
-      const prescriptions = await Prescription.countDocuments();
-
+    } else if (role === "admin") {
+      const [
+        users,
+        doctors,
+        patients,
+        appointments,
+        records,
+        prescriptions,
+      ] = await Promise.all([
+        User.estimatedDocumentCount(),
+        User.countDocuments({ role: "doctor" }),
+        User.countDocuments({ role: "patient" }),
+        Appointment.estimatedDocumentCount(),
+        MedicalRecord.estimatedDocumentCount(),
+        Prescription.estimatedDocumentCount(),
+      ]);
 
       dashboard = {
         users,
@@ -118,20 +76,13 @@ const getDashboard = async (req, res, next) => {
         records,
         prescriptions,
       };
-
     }
 
-
     res.status(200).json(dashboard);
-
-
   } catch (error) {
-
     next(error);
-
   }
 };
-
 
 module.exports = {
   getDashboard,
