@@ -116,7 +116,8 @@ const getDoctors = async (req, res, next) => {
       .select(
         "fullName email role phone profileImage specialization yearsOfExperience hospital bio isVerified"
       )
-      .sort({ fullName: 1 });
+      .sort({ fullName: 1 })
+      .lean();
 
     res.status(200).json({
       count: doctors.length,
@@ -138,7 +139,8 @@ const getAllUsers = async (req, res, next) => {
       .select(
         "fullName email role phone profileImage dateOfBirth gender address bloodGroup emergencyContact specialization yearsOfExperience licenseNumber hospital bio isVerified createdAt updatedAt"
       )
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.status(200).json({
       count: users.length,
