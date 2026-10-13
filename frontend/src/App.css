@@ -763,17 +763,7 @@ button:disabled, .auth-button:disabled { opacity: 0.55; cursor: not-allowed; tra
     linear-gradient(145deg, var(--brand-500), var(--brand-900));
   box-shadow: var(--shadow-lg);
 }
-   :root[data-theme="dark"] {
-     --bg: #0b1512;
-     --surface: #111f1a;
-     --surface-2: #162720;
-     --ink: #e8f3ee;
-     --ink-2: #b9cbc3;
-     --muted: #8aa095;
-     --line: #22362e;
-     --brand-50: #0f2a21;
-     --brand-100: #14382b;
-   }
+
 .home-card-icon { width: 54px; height: 54px; margin-bottom: 20px; font-size: 28px; background: rgba(255, 255, 255, 0.2); color: #fff; }
 .home-hero-card h2 { margin: 0 0 8px; font-size: 1.6rem; letter-spacing: -0.03em; }
 .home-hero-card p { margin: 0; color: rgba(255, 255, 255, 0.85); }
@@ -917,3 +907,91 @@ button:disabled, .auth-button:disabled { opacity: 0.55; cursor: not-allowed; tra
   .dashboard-header, .quick-actions, .back-button, .logout-button { display: none !important; }
   body { background: #fff; }
 }
+/* =====================================================
+   DARK MODE + THEME TOGGLE  (keep this block at the very bottom)
+   ========================================================== */
+.theme-toggle {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+.theme-toggle:hover { border-color: var(--brand-500); color: var(--brand-600); }
+.theme-toggle:active { transform: scale(0.94); }
+@media print { .theme-toggle { display: none !important; } }
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0b1512;
+  --surface: #111f1a;
+  --surface-2: #162720;
+  --ink: #e8f3ee;
+  --ink-2: #b9cbc3;
+  --muted: #8aa095;
+  --line: #22362e;
+
+  --brand-50: #0f2a21;
+  --brand-100: #14382b;
+  --brand-200: #1d5441;
+  --brand-600: #34d399;
+  --brand-700: #5eead4;
+
+  --danger: #f87171;
+  --danger-bg: #2a1416;
+  --warn: #fbbf24;
+  --warn-bg: #2a2110;
+  --info: #7cb0ff;
+  --info-bg: #12203a;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 20px 50px -12px rgba(0, 0, 0, 0.6);
+}
+
+:root[data-theme="dark"] .dashboard-header { background: rgba(11, 21, 18, 0.82); }
+:root[data-theme="dark"] .auth-card { background: rgba(17, 31, 26, 0.96); }
+:root[data-theme="dark"] .home-footer { background: rgba(11, 21, 18, 0.6); }
+:root[data-theme="dark"] .empty-state,
+:root[data-theme="dark"] .prescription-empty-state,
+:root[data-theme="dark"] .admin-users-empty { border-color: #2c453a; }
+:root[data-theme="dark"] .form-group select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%238aa095' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+:root[data-theme="dark"] .form-group input::placeholder,
+:root[data-theme="dark"] .form-group textarea::placeholder { color: #5d7469; }
+:root[data-theme="dark"] .logout-button { background: var(--brand-600); color: #04261b; }
+:root[data-theme="dark"] .logout-button:hover { background: #5eead4; }
+:root[data-theme="dark"] .error-message { color: #fca5a5; border-color: #5b2226; }
+:root[data-theme="dark"] .success-message { color: #a7f3d4; border-color: #1d5441; }
+:root[data-theme="dark"] .appointment-cancel-button,
+:root[data-theme="dark"] .admin-user-delete-button { border-color: #5b2226; }
+:root[data-theme="dark"] .status-pending { border-color: #5a4515; }
+:root[data-theme="dark"] .status-completed,
+:root[data-theme="dark"] .role-patient,
+:root[data-theme="dark"] .admin-role-patient { border-color: #233a63; }
+:root[data-theme="dark"] .status-cancelled { border-color: #5b2226; }
+:root[data-theme="dark"] .role-admin,
+:root[data-theme="dark"] .admin-role-admin { background: #1d1733; color: #c4b5fd; border-color: #382a63; }
+:root[data-theme="dark"] .home-hero-content h1 { background: linear-gradient(135deg, #ffffff 30%, var(--brand-600)); -webkit-background-clip: text; background-clip: text; }
+:root[data-theme="dark"] .home-primary-button,
+:root[data-theme="dark"] .auth-button,
+:root[data-theme="dark"] .medical-record-view-button,
+:root[data-theme="dark"] .profile-save-button,
+:root[data-theme="dark"] .admin-user-verify-button,
+:root[data-theme="dark"] .not-found-home-button { color: #04261b; }
+:root[data-theme="dark"] .home-cta .home-primary-button { background: #fff; color: #064e3b; }
+:root[data-theme="dark"] .home-hero-card,
+:root[data-theme="dark"] .home-cta { border: 1px solid #1d3a2f; }
