@@ -1,19 +1,22 @@
+/* ==========================================================
+   HealthConnect — base / reset
+   ========================================================== */
 :root {
-  font-family: Arial, Helvetica, sans-serif;
-  color: #172033;
-  background: #f5f7fb;
+  --font: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: var(--font);
+  color-scheme: light;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
 }
 
-* {
-  box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; }
 
-html,
-body {
+html { scroll-behavior: smooth; }
+
+html, body {
   margin: 0;
   padding: 0;
   min-width: 320px;
@@ -22,8 +25,20 @@ body {
 
 body {
   margin: 0;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 
-#root {
-  min-height: 100vh;
+#root { min-height: 100vh; }
+
+img, svg, video { max-width: 100%; height: auto; }
+
+button, input, select, textarea { font: inherit; color: inherit; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
