@@ -89,7 +89,8 @@ const getMedicalRecords = async (req, res, next) => {
         patient: req.user._id,
       })
         .populate("doctor", "fullName email phone")
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
+        .lean();
     }
 
     // Doctor
@@ -98,7 +99,8 @@ const getMedicalRecords = async (req, res, next) => {
         doctor: req.user._id,
       })
         .populate("patient", "fullName email phone")
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
+        .lean();
     }
 
     // Admin
@@ -106,7 +108,8 @@ const getMedicalRecords = async (req, res, next) => {
       records = await MedicalRecord.find()
         .populate("patient", "fullName email phone")
         .populate("doctor", "fullName email phone")
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
+        .lean();
     }
 
     res.status(200).json({
