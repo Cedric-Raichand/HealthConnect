@@ -113,7 +113,8 @@ const getPrescriptions = async (req, res, next) => {
           "medicalRecord",
           "diagnosis symptoms treatment notes createdAt"
         )
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
+        .lean();
     } else if (req.user.role === "doctor") {
       prescriptions = await Prescription.find({
         doctor: req.user._id,
@@ -123,7 +124,8 @@ const getPrescriptions = async (req, res, next) => {
           "medicalRecord",
           "diagnosis symptoms treatment notes createdAt"
         )
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
+        .lean();
     } else if (req.user.role === "admin") {
       prescriptions = await Prescription.find()
         .populate("patient", "fullName email")
@@ -132,7 +134,8 @@ const getPrescriptions = async (req, res, next) => {
           "medicalRecord",
           "diagnosis symptoms treatment notes createdAt"
         )
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
+        .lean();
     }
 
     res.status(200).json({
