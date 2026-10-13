@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const helmet = require("helmet");
+const compression = require("compression");
 
 const authRoutes = require("./routes/authRoutes");
 const appointmentRoutes = require("./routes/appointmentRoutes");
@@ -29,16 +30,32 @@ connectDB();
 
 const app = express();
 
+// Behind Render/Railway/Vercel the real client IP arrives via a proxy header.
+// Without this every user shares one IP and hits the rate limiter together.
+app.set("trust proxy", 1);
+
 // ===============================
 // Security Middleware
 // ===============================
 
 app.use(helmet());
 
+const allowedOrigins = (
+  process.env.CLIENT_URL || "http://localhost:5173"
+)
+  .split(",")
+  .map((o) => o.trim().replace(/\/$/, ""))
+  .filter(Boolean);
+
+app.use(compression());
+
 app.use(
   cors({
-    origin:
-      process.env.CLIENT_URL || "http://localhost:5173",
+    origin(origin, cb) {
+      // allow same-origin / tools (no Origin header) and listed origins
+      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+      return cb(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
@@ -96,4 +113,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
